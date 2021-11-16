@@ -129,11 +129,21 @@ class UsersController extends AppController
      public function login() {
 
         $this->set('title_for_layout', 'Log in');
+
+         $user = $this->sessionRead('Auth.User');
+
+         $this->log('$user 001');
+         $this->log($user);
+
+         if(!empty($user)){
+             return $this->redirect('/admin/dashboard');
+         }
+
         if ($this->request->is('post')) {
 
             $data = $this->request->getData();
 
-            $username = trim($data['username']);
+            $username = trim($data['email']);
             if (!empty($this->request->getParam('_ext')) && $this->request->getParam('_ext') == 'json') {
                 $uid = $this->sessionRead('Auth.User.id');
                 if (!empty($uid)) {
@@ -152,7 +162,7 @@ class UsersController extends AppController
 
                 $role_id = $role ? $role->id : '';
                 $conditions = [
-                    'username' => $username,
+                    'email' => $username,
                     'password' => Security::hash($password, null, true),
                     'status' => true,
                     'role_id' => $role_id,
@@ -163,10 +173,10 @@ class UsersController extends AppController
                 $users['Role'] = $role;
                 $response = json_decode($users, true);
                 if( !empty($response) && isset($response['status'])){
-                    $loggedIn = $response;
+                    $loggedIn['User'] = $response;
                 }
 
-                if (!empty($loggedIn['Role'])) {
+                if (!empty($loggedIn['User']['Role'])) {
                     $this->sessionWrite('Auth', $loggedIn);
                     $this->Auth->setUser($loggedIn);
                     $success = true;

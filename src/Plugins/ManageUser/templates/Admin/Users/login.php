@@ -54,12 +54,12 @@
                                 <?php echo $this->Form->create(null, ['id' => 'admin-login-form']); ?>
                                 <div class="form-group">
                                     <?php
-                                    echo $this->Form->input('username', array(
-                                        'type' =>'text',
+                                    echo $this->Form->input('email', array(
+                                        'type' =>'email',
                                         'class' =>'form-control',
                                         'id' =>'email',
                                         'label' =>false,
-                                        'placeholder' =>'Username'
+                                        'placeholder' =>'Email'
                                     ));
                                     ?>
                                 </div>
@@ -93,11 +93,7 @@
 <!--**********************************
     Scripts
 ***********************************-->
-<script src="/webroot/plugins/common/common.min.js"></script>
-<script src="/webroot/js/custom.min.js"></script>
-<script src="/webroot/js/settings.js"></script>
-<script src="/webroot/js/gleek.js"></script>
-<script src="/webroot/js/styleSwitcher.js"></script>
+
 </body>
 </html>
 

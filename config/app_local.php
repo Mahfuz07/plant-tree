@@ -75,12 +75,41 @@ return [
      */
     'EmailTransport' => [
         'default' => [
-            'host' => 'localhost',
-            'port' => 25,
-            'username' => null,
-            'password' => null,
+            'className' => 'Smtp',
+            // The following keys are used in SMTP transports
+            'host' => 'ssl://smtp.gmail.com',
+            'port' => 465,
+            'timeout' => 5000,
+            'username' => 'amahfuzanan@gmail.com',
+            'password' => '27692921@Mac',
             'client' => null,
+            'tls' => null,
             'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
         ],
+        'gmail' => [
+            'className' => 'Smtp',
+            // The following keys are used in SMTP transports
+            'host' => 'ssl://smtp.gmail.com',
+            'port' => 465,
+            'timeout' => 30,
+            'username' => 'amahfuzanan@gmail.com',
+            'password' => '27692921@Mac',
+            'tls' => true
+        ],
+    ],
+
+    'Email' => [
+        'default' => [
+            'transport' => 'default',
+            'from' => 'you@localhost',
+            //'charset' => 'utf-8',
+            //'headerCharset' => 'utf-8',
+        ],
+        'gmail' => [
+            'transport' => 'default',
+            'from' => 'you@localhost',
+            //'charset' => 'utf-8',
+            //'headerCharset' => 'utf-8',
+        ]
     ],
 ];

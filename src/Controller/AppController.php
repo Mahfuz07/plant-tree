@@ -67,7 +67,7 @@ Abstract class AppController extends Controller
             }
         }
 
-        $this->sessionWrite('securepaytest','yes');
+
         parent::initialize();
 
         $req = $this->getRequest();

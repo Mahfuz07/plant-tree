@@ -33,10 +33,10 @@ class LocalDevicesController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'login', 'getTokenByRefreshToken', 'logout'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser'
         ]);
         $actions =  array(
-            'login', 'getTokenByRefreshToken', 'logout'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -49,16 +49,16 @@ class LocalDevicesController extends AppController
             $request_data = $this->json_decode($request_data, true);
             $this->log($request_data);
 
-            $username = isset($request_data['User']['username']) ? $request_data['User']['username']:'';
+            $email = isset($request_data['User']['email']) ? $request_data['User']['email']:'';
             $password = isset($request_data['User']['password']) ? $request_data['User']['password']:'';
 
             $udid = isset($request_data['User']['udid'])?$request_data['User']['udid']:'';
             $device_name = isset($request_data['User']['device_name'])?$request_data['User']['device_name']:'';
 
-            if(!empty($username) && !empty($password)){
+            if(!empty($email) && !empty($password)){
 
                 $users = $this->Users->find()->where([
-                    'username' => $username,
+                    'email' => $email,
                     'password' => Security::hash($password, null, true),
                     'status' => true
                 ])->first();
@@ -187,6 +187,97 @@ class LocalDevicesController extends AppController
                 'status' => 'error',
                 'msg' => 'Invalid request method',
                 'mode' => $this->mode)));
+        }
+    }
+
+    public function createUser () {
+
+        if($this->request->is('post')){
+            $request_data = file_get_contents("php://input");
+            $request_data = $this->json_decode($request_data, true);
+            $this->log($request_data);
+
+            if (!empty($request_data)) {
+                $email = isset($request_data['User']['email']) ? $request_data['User']['email']:'';
+                $displayName = isset($request_data['User']['display_name']) ? $request_data['User']['display_name']:'';
+                $password = isset($request_data['User']['password']) ? $request_data['User']['password']:'';
+
+                $errorMessage = [];
+                if (empty($displayName)) {
+                    array_push($errorMessage,['Required field display name is missing']);
+                }
+                if (empty($email)) {
+                    array_push($errorMessage,['Required field email is missing']);
+                }
+                if (empty($password)) {
+                    array_push($errorMessage, ['Required field password is missing']);
+                }
+
+                if (count($errorMessage) == 0) {
+                    $getEmail = $this->Users->find()->where(['email' => $email])->first();
+                    if (empty($getEmail)) {
+                        $roles = $this->Roles->find()->all()->toArray();
+                        $users = $this->Users->newEmptyEntity();
+                        $userData['display_name'] = $displayName;
+                        $userData['email'] = $email;
+                        $userData['password'] = Security::hash($password, null, true);
+                        $userData['role_id'] = $roles[1]['id'];
+                        $userData['status'] = 1;
+
+                        $users = $this->Users->patchEntity($users, $userData);
+                        $user = $this->Users->save($users);
+                        if ($user->id) {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'msg' => 'Account Create Successfully',
+                                    'mode' => $this->mode)));
+                        } else{
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'error',
+                                    'msg' => 'Oops user create failed',
+                                    'mode' => $this->mode)));
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => 'Email Already Exist!',
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(404)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => $errorMessage,
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        }else{
+            return $this->getResponse()
+                ->withStatus(200)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid request method',
+                    'mode' => $this->mode)));
         }
     }
 

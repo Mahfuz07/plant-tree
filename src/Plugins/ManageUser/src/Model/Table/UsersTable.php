@@ -44,7 +44,7 @@ class UsersTable extends Table
     {
         parent::initialize($config);
         $this->setTable('users');
-        $this->setDisplayField('name');
+//        $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
         $this->addBehavior('Timestamp', [
@@ -56,10 +56,10 @@ class UsersTable extends Table
             ]
         ]);
 
-        $this->belongsTo('Roles', [
-            'foreignKey' => 'role_id',
-            'joinType' => 'INNER'
-        ]);
+//        $this->belongsTo('Roles', [
+//            'foreignKey' => 'role_id',
+//            'joinType' => 'INNER'
+//        ]);
     }
 
     public static function defaultConnectionName():string
@@ -79,11 +79,11 @@ class UsersTable extends Table
             ->integer('id')
             ->allowEmptyString('id', 'create');
 
-        $validator
-            ->scalar('username')
-            ->maxLength('username', 60)
-            ->requirePresence('username', 'create')
-            ->allowEmptyString('username', false);
+//        $validator
+//            ->scalar('username')
+//            ->maxLength('username', 60)
+//            ->requirePresence('username', 'create')
+//            ->allowEmptyString('username', false);
 
         $validator
             ->scalar('password')
@@ -91,21 +91,21 @@ class UsersTable extends Table
             ->requirePresence('password', 'create')
             ->allowEmptyString('password', false);
 
-        $validator
-            ->scalar('name')
-            ->maxLength('name', 100)
-            ->requirePresence('name', 'create')
-            ->allowEmptyString('name', false);
+//        $validator
+//            ->scalar('name')
+//            ->maxLength('name', 100)
+//            ->requirePresence('name', 'create')
+//            ->allowEmptyString('name', false);
 
         $validator
             ->email('email')
             ->requirePresence('email', 'create')
             ->allowEmptyString('email', false);
 
-        $validator
-            ->scalar('image')
-            ->maxLength('image', 255)
-            ->allowEmptyFile('image');
+//        $validator
+//            ->scalar('image')
+//            ->maxLength('image', 255)
+//            ->allowEmptyFile('image');
 
         $validator
             ->boolean('status')

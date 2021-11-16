@@ -58,6 +58,14 @@ return static function (RouteBuilder $routes) {
 
             $routes->connect('/dashboard', ['plugin' => 'ManageUser', 'controller' => 'Users',  'action' => 'dashboard']);
 
+            $routes->connect('/customers/add', ['controller' => 'Customers',  'action' => 'add']);
+
+            $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
+
+            $routes->connect('/categories/add', ['controller' => 'Categories',  'action' => 'add']);
+
+            $routes->connect('/customers/check-email', ['controller' => 'Customers',  'action' => 'checkEmail']);
+
             $routes->connect('/logout', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'logout']);
 
             $routes->connect('/forgot-password', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'forgotPassword']);
@@ -87,6 +95,7 @@ return static function (RouteBuilder $routes) {
 
         //internal software apis
         $routes->connect('/users/api-user-login', ['controller' => 'LocalDevices', 'action' => 'login']);
+        $routes->connect('/users/create-user', ['controller' => 'LocalDevices', 'action' => 'createUser']);
         $routes->connect('/users/refresh-token', ['controller' => 'LocalDevices', 'action' => 'getTokenByRefreshToken']);
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);
@@ -100,39 +109,4 @@ return static function (RouteBuilder $routes) {
     });
 
 };
-
-
-
-///** @var \Cake\Routing\RouteBuilder $routes */
-//$routes->setRouteClass(DashedRoute::class);
-//
-//$routes->scope('/',['path'=> '/api'], function (RouteBuilder $builder) {
-//
-//    $builder->setExtensions(['json', 'xml']);
-//
-//    $builder->connect('/users/api_user_login', ['controller' => 'LocalDevices', 'action' => 'login']);
-//    $builder->fallbacks('InflectedRoute');
-//});
-//
-//
-//RouteBuilder::prefix('api', function ($routes) {
-//    $routes->setExtensions(['json', 'xml']);
-//    $routes->fallbacks('InflectedRoute');
-//
-//    //device apis
-////    $routes->connect('/users/users/get_token_by_refresh_token', ['controller' => 'LocalDevices', 'action' => 'getToken']);
-////    $routes->connect('/users/users/api_user_login/staff', ['controller' => 'LocalDevices', 'action' => 'login']);
-//
-//    //internal software apis
-//    $routes->connect('/users/api_user_login', ['controller' => 'LocalDevices', 'action' => 'login']);
-////    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
-////    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);
-////    $routes->connect('/users/users/api_forgot_password', ['controller' => 'LocalDevices', 'action' => 'apiForgotPassword']);
-////    $routes->connect('/users/users/api_reset', ['controller' => 'LocalDevices', 'action' => 'apiReset']);
-////    $routes->connect('/users/users/api_check_email', ['controller' => 'LocalDevices', 'action' => 'apiCheckEmail']);
-////    $routes->connect('/users/users/api-reset-password', ['controller' => 'LocalDevices', 'action' => 'apiResetPassword']);
-////    $routes->connect('/users/users/api-change-password', ['controller' => 'LocalDevices', 'action' => 'apiChangePassword']);
-////    $routes->connect('/users/users/api-user-add', ['controller' => 'LocalDevices', 'action' => 'apiUserAdd']);
-//
-//});
 
