@@ -1,65 +1,103 @@
-<div class="login-area">
 
-    <div class="login-left">
-<!--        <img src="/css/admin_styles/images/main_logo.png">-->
+<!DOCTYPE html>
+<html class="h-100" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="../../assets/images/favicon.png">
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous"> -->
+    <link href="/webroot/css/style.css" rel="stylesheet">
+
+</head>
+
+<body class="h-100">
+
+<!--*******************
+    Preloader start
+********************-->
+<div id="preloader">
+    <div class="loader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+        </svg>
     </div>
+</div>
+<!--*******************
+    Preloader end
+********************-->
 
-    <div class="login-right">
-        <div class="login-box v-middle">
-            <h3>Login</h3>
-            <div class="row">
-                <div class="col-md-12">
-                    <?php echo $this->Flash->render('admin_success'); ?>
-                    <?php echo $this->Flash->render('admin_error'); ?>
+
+
+
+
+<div class="login-form-bg h-100">
+    <div class="container h-100">
+        <div class="row justify-content-center h-100">
+            <div class="col-xl-6">
+                <div class="form-input-content">
+                    <div class="card login-form mb-0">
+                        <div class="card-body pt-5">
+                            <a class="text-center" href="index.html"> <h4>Login</h4></a>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <?php echo $this->Flash->render('admin_success'); ?>
+                                    <?php echo $this->Flash->render('admin_error'); ?>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 mb-5 login-input">
+                                <?php echo $this->Form->create(null, ['id' => 'admin-login-form']); ?>
+                                <div class="form-group">
+                                    <?php
+                                    echo $this->Form->input('email', array(
+                                        'type' =>'email',
+                                        'class' =>'form-control',
+                                        'id' =>'email',
+                                        'label' =>false,
+                                        'placeholder' =>'Email'
+                                    ));
+                                    ?>
+                                </div>
+                                <div class="form-group">
+                                    <?php
+                                    echo $this->Form->input('password', array(
+                                        'type' =>'password',
+                                        'class' =>'form-control',
+                                        'label' =>false,
+                                        'id' =>'password',
+                                        'placeholder' =>'Password'
+                                    ));
+
+                                    ?>
+                                </div>
+                                <button class="btn login-form__btn submit w-100">Sign In</button>
+                                <?php echo $this->Form->end() ?>
+                            </div>
+                            <p class="mt-5 login-form__footer">Dont have account? <a href="page-register.html" class="text-primary">Sign Up</a> now</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <?php echo $this->Form->create(null, ['id' => 'admin-login-form']); ?>
-            <div class="form-area">
-                <?php
-                echo $this->Form->input('username', array(
-                    'type' =>'text',
-                    'class' =>'md-input',
-                    'id' =>'email',
-                    'label' =>false,
-                    'placeholder' =>'Username'
-                ));
-
-                echo $this->Form->input('password', array(
-                    'type' =>'password',
-                    'class' =>'md-input',
-                    'label' =>false,
-                    'id' =>'password',
-                    'placeholder' =>'Password'
-                ));
-
-                ?>
-                <input type="submit" value="Sign in">
-
-            </div>
-
-            <div class="remeber-box flex-container">
-                <label for="log-rem">
-                    <?php
-                    echo $this->Form->checkbox('remember_me', array(
-                        'hiddenField' => false,
-                        'id' =>'log-rem',
-                        //'before' => '<label>',
-                        //'after' => 'Remember Me</label>'
-                    ));
-                    $this->Form->unlockField('remember_me');
-                    ?> Remember Me
-                    <!--                <input id="log-rem" type="checkbox" name="remember_me"> Remember Me-->
-                </label>
-                <div class="forget"><a href="<?php echo $this->url->build('/forgot-password'); ?>">Forgot Password ?</a></div>
-            </div>
-            <?php echo $this->Form->end() ?>
-            <div class="separate-box">
-                <span>or</span>
-            </div>
-            <div class="new-signup">
-                <a href="">Sign up for new account</a>
             </div>
         </div>
     </div>
-
 </div>
+
+
+
+
+<!--**********************************
+    Scripts
+***********************************-->
+
+</body>
+</html>
+
+
+
+
+
