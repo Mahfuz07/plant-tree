@@ -93,6 +93,7 @@ class UsersController extends AppController
                 $users = $this->Users->find()->where($conditions)->first();
 
                 $users['Role'] = $role;
+                dd($users);
                 $response = json_decode($users, true);
                 if( !empty($response) && isset($response['status'])){
                     $loggedIn = $response;
