@@ -16,7 +16,7 @@
                     <i class="fa fa-archive menu-icon"></i><span class="nav-text">Products</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="/admin/products/add">Product</a></li>
+                    <li><a href="/admin/products">Product</a></li>
                     <li><a href="/admin/categories/add">Category</a></li>
                     <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
                     <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->

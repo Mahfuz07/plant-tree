@@ -62,6 +62,26 @@
 <script src="/webroot/plugins/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js"></script>
 <script src="/webroot/js/dashboard/dashboard-1.js"></script>
 
+<script src="/webroot/plugins/summernote/dist/summernote.min.js"></script>
+<script src="/webroot/plugins/summernote/dist/summernote-init.js"></script>
+
+<link href="/webroot/plugins/summernote/dist/summernote.css" rel="stylesheet">
+<link href="/webroot/css/style.css" rel="stylesheet">
+
+<script src="/webroot/plugins/validation/jquery.validate.min.js"></script>
+<script src="/webroot/plugins/validation/jquery.validate-init.js"></script>
+
+<script src="/webroot/plugins/tables/js/jquery.dataTables.min.js"></script>
+<script src="/webroot/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
+<script src="/webroot/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
+
+
+<!--<script src="/webroot/js/jquery.min.js"></script>-->
+<!--    <script src="/webroot/js/bootstrap.min.js"></script>-->
+<script src="/webroot/js/croppie.js"></script>
+<!--    <link rel="stylesheet" href="/webroot/css/bootstrap.min.css" />-->
+<link rel="stylesheet" href="/webroot/css/croppie.css" />
+
 <script type="text/javascript">
     $(document).ready(function(){ //newly added
         $('#val-email').blur(function() {
@@ -100,5 +120,75 @@
         $("#val-confirm-password").keyup(checkPasswordMatch);
     });
 </script>
+
+<script>
+    $(document).ready(function(){
+
+        $image_crop = $('#image_demo').croppie({
+            enableExif: true,
+            viewport: {
+                width:400,
+                height:400,
+                type:'square' //circle
+            },
+            boundary:{
+                width:500,
+                height:500
+            }
+        });
+
+        // $image_crop_big_size = $('#upload_image').croppie({
+        //     enableExif: true,
+        //     viewport: {
+        //         width:800,
+        //         height:800,
+        //         type:'square' //circle
+        //     },
+        //     boundary:{
+        //         width:800,
+        //         height:800
+        //     }
+        // });
+
+        $('#upload_image').on('change', function(){
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                $image_crop.croppie('bind', {
+                    url: event.target.result
+                }).then(function(){
+                    console.log('jQuery bind complete');
+                });
+            }
+            reader.readAsDataURL(this.files[0]);
+            // $('#uploadimageModal').modal('show');
+        });
+
+        $('.crop_image').click(function(event){
+            $image_crop.croppie('result', {
+                type: 'canvas',
+                size: 'viewport'
+            }).then(function(response){
+                console.log(response);
+
+                $('#upload_image').html('');
+                $('#uploaded_image').html('<img src="'+response+'" alt="Girl in a jacket" width="200" height="200"/> ' +
+                    '<input name="image" value="'+response+'" hidden>');
+
+                // $.ajax({
+                //     url:"upload.php",
+                //     type: "POST",
+                //     data:{"image": response},
+                //     success:function(data)
+                //     {
+                //         $('#uploadimageModal').modal('hide');
+                //         $('#uploaded_image').html(data);
+                //     }
+                // });
+            })
+        });
+
+    });
+</script>
+
 </body>
 </html>

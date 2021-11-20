@@ -62,6 +62,10 @@ return static function (RouteBuilder $routes) {
 
             $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
 
+            $routes->connect('/products/edit/*', ['controller' => 'Products',  'action' => 'edit']);
+
+            $routes->connect('/products', ['controller' => 'Products',  'action' => 'index']);
+
             $routes->connect('/categories/add', ['controller' => 'Categories',  'action' => 'add']);
 
             $routes->connect('/customers/check-email', ['controller' => 'Customers',  'action' => 'checkEmail']);

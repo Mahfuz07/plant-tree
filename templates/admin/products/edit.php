@@ -70,13 +70,15 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="form-validation">
-                                <?php echo $this->Form->create(null, ['id' => 'user-password-form']); ?>
+                                <?php echo $this->Form->create($product , ['id' => 'user-password-form']); ?>
                                 <div class="form-valide" action="#" method="post">
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-Image">
                                         </label>
                                         <div class="col-lg-6">
-                                            <div id="uploaded_image"></div>
+                                            <div id="uploaded_image" >
+                                                <img src="<?= $product['image'] ;?>" alt="Girl in a jacket" width="200" height="200"/>
+                                            </div>
                                         </div>
 
                                     </div>
@@ -106,7 +108,7 @@
                                                     }
                                                 }
 
-                                            echo $this->Form->control('category_id',array('empty'=>'Select Category','id'=>'category_id','class'=>"form-control",'type'=>'select','options'=> $vss,'label'=> false, 'value' => '', 'required' => true));
+                                            echo $this->Form->control('category_id',array('empty'=>'Select Category','id'=>'category_id','class'=>"form-control",'type'=>'select','options'=> $vss,'label'=> false, 'value' => $product['category_id'], 'required' => true));
                                             ?>
                                         </div>
                                     </div>
@@ -185,17 +187,16 @@
                                         </label>
                                         <div class="col-lg-6">
                                             <!--                                            <input type="password" class="form-control" id="val-confirm-password" name="val-confirm-password" placeholder="..and confirm it!">-->
-                                            <input type="text" class="form-control" id="val-number" name="val-number" placeholder="5.0">
-<!--                                            --><?php
-//                                            echo $this->Form->input('price', array(
-//                                                'type' =>'text',
-//                                                'class' =>'form-control',
-//                                                'id' =>'val-number',
-//                                                'label' =>false,
-//                                                'placeholder' =>'price',
-//                                                'required' => true
-//                                            ));
-//                                            ?>
+                                            <?php
+                                            echo $this->Form->input('price', array(
+                                                'type' =>'text',
+                                                'class' =>'form-control',
+                                                'id' =>'val-number',
+                                                'label' =>false,
+                                                'placeholder' =>'price',
+                                                'required' => true
+                                            ));
+                                            ?>
                                         </div>
 
                                     </div>
@@ -205,10 +206,10 @@
                                         </label>
                                         <div class="col-lg-8">
                                             <label class="css-control css-control-primary css-checkbox" for="val-terms">
-                                                <input type="checkbox" class="css-control-input" id="val-terms" name="published" value="1" required> <span class="css-control-indicator"></span>  checkbox</label>
-                                            <!--                                            --><?php
-                                            //                                            echo $this->Form->checkbox('published', array('type' => 'checkbox', 'checked'=>false, 'class' => 'form-control', 'label' => 'Published'));
-                                            //                                            ?>
+<!--                                                <input type="checkbox" class="css-control-input" id="val-terms" name="published" value="--><?//= $product['published'] ?><!--" required> <span class="css-control-indicator"></span>  checkbox</label>-->
+                                            <?php
+                                            echo $this->Form->checkbox('published', array('type' => 'checkbox', 'checked'=>$product['published'], 'class' => 'css-control-input', 'label' => 'Published'));
+                                            ?>
                                         </div>
                                     </div>
                                     <!--                                    <div class="form-group row">-->
@@ -313,7 +314,7 @@
 <!--id="uploadimageModal"-->
 <div class="modal fade" id="basicModal">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="width: 700px">
             <div class="modal-header">
                 <h5 class="modal-title">Crop & Upload Image</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
