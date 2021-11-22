@@ -22,6 +22,8 @@ class LocalDevicesController extends AppController
 
         $this->Users = $this->getDbTable('ManageUser.Users');
         $this->Roles =  $this->getDbTable('ManageUser.Roles');
+        $this->Categories = $this->getDbTable('Categories');
+        $this->Products = $this->getDbTable('Products');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -36,7 +38,7 @@ class LocalDevicesController extends AppController
             'login', 'getTokenByRefreshToken', 'logout', 'createUser'
         ]);
         $actions =  array(
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -277,6 +279,113 @@ class LocalDevicesController extends AppController
                 ->withStringBody(json_encode(array(
                     'status' => 'error',
                     'msg' => 'Invalid request method',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getAllProductsByCategory() {
+
+        if ($this->AccessToken->verify()) {
+            if ($this->request->is('get')) {
+
+                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->toArray();
+
+                if (!empty($products)) {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'products' => $products,
+                            'mode' => $this->mode)));
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'msg' => 'No products have been released yet.',
+                            'mode' => $this->mode)));
+                }
+
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getProduct() {
+
+        if ($this->AccessToken->verify()) {
+            if ($this->request->is('post')) {
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
+
+                    $product = $this->Products->find()->where(['id' => $product_id, 'published' => 1])->first();
+
+                    if (!empty($product)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'products' => $product,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'msg' => 'Product Not Published',
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing Input Data!',
+                            'mode' => $this->mode)));
+                }
+
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
                     'mode' => $this->mode)));
         }
     }

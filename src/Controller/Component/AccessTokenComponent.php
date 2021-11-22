@@ -188,25 +188,6 @@ class AccessTokenComponent extends BaseComponent
         return $result;
     }
 
-//    public function getTokenByRefreshToken($refresh_token = null)
-//    {
-//        if(!empty($refresh_token)){
-//            $url = $this->baseURI."/oauth/access_token.json";
-//
-//            $data = array();
-//            $data['grant_type'] = "refresh_token";
-//            $data['client_id'] = "1";
-//            $data['client_secret'] = "client_secret";
-//            $data['redirect_uri'] = "http://cake4oauth.com"; //redirect_uri
-//            $data['refresh_token'] = $refresh_token;
-//            $result = $this->processViaCurl($url,$data);
-//
-//        }else{
-//            $result = false;
-//        }
-//        return $result;
-//    }
-
     public function getTokenByRefreshToken( $refresh_token)
     {
         if(!empty($refresh_token)){
@@ -227,35 +208,11 @@ class AccessTokenComponent extends BaseComponent
         return $result;
     }
 
-//    public function tokenValidation($token)
-//    {
-//        $this->AccessTokens =  TableRegistry::getTableLocator()->get('OAuthServer.AccessTokens');
-//        //pr($result = $this->AccessTokens); die('xxxxxxxxx');
-//        $result = $this->AccessTokens->find()
-//            ->select([
-//                'oauth_token',
-//                'expires'
-//            ])->where([
-//                'oauth_token' => trim($token)
-//            ])->first();
-//            //pr($result); die('bbbbbbbvV');
-//        if($result && isset($result['expires']) && $result['expires'] > strtotime(date('Y-m-d h:i:s'))){
-//            return true;
-//
-//        }else{
-//            //update user login details
-//            $this->updateUserLoginDetails($token, 0);
-//
-//            return false;
-//        }
-//    }
-
-    public function tokenValidation($token, $university_id)
+    public function tokenValidation($token)
     {
 
         $connection = ConnectionManager::get('default');
-        $prefix = $this->getComponent('CommonFunction')->getUniversityDatabaseTablePrefix($university_id);
-        $getDatas = "SELECT oauth_token, expires from ".$prefix."oauth_access_tokens WHERE oauth_token = '".$token."';";
+        $getDatas = "SELECT oauth_token, expires from oauth_access_tokens WHERE oauth_token = '".$token."';";
 
         $result = $connection->execute($getDatas)->fetch('assoc');
 
@@ -269,19 +226,11 @@ class AccessTokenComponent extends BaseComponent
 
     public function verify()
     {
-//	    return false;
-//        dd(is_array($this->controller->getRequest()->getQuery('accessToken')));
         $accessToken = $this->controller->getRequest()->getHeader('Authorization');
         $accessToken = explode('Bearer ', $accessToken[0]);
 
         if(count($accessToken) == 2 && !empty($accessToken[1])) {
-//            $authorizationToken = $this->controller->request->getHeader('Authorization');
-//            $authorizationToken = $this->controller->getRequest()->getQuery('accessToken');
-            $university_id = $this->controller->getRequest()->getQuery('university_id');
-            $this->log($accessToken[1]);
-            // $token_array = explode('Bearer', $authorizationToken[0]);
-            //if(count($token_array) == 2 && !empty($token_array[1])){
-            return $this->tokenValidation($accessToken[1], $university_id);
+            return $this->tokenValidation($accessToken[1]);
          }else{
              return false;
          }

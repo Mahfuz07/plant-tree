@@ -101,6 +101,10 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/users/api-user-login', ['controller' => 'LocalDevices', 'action' => 'login']);
         $routes->connect('/users/create-user', ['controller' => 'LocalDevices', 'action' => 'createUser']);
         $routes->connect('/users/refresh-token', ['controller' => 'LocalDevices', 'action' => 'getTokenByRefreshToken']);
+
+        $routes->connect('/products/getAllProductsByCategory', ['controller' => 'LocalDevices', 'action' => 'getAllProductsByCategory']);
+        $routes->connect('/products/getProduct', ['controller' => 'LocalDevices', 'action' => 'getProduct']);
+
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);
 //    $routes->connect('/users/users/api_forgot_password', ['controller' => 'LocalDevices', 'action' => 'apiForgotPassword']);

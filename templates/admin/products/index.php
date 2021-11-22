@@ -86,6 +86,7 @@
                                             <th>#</th>
                                             <th>Name</th>
                                             <th>Display Name</th>
+                                            <th>image</th>
                                             <th>description</th>
                                             <th>price</th>
                                             <th>Published</th>
@@ -98,6 +99,7 @@
                                             <td><?= $product['id'] ?></td>
                                             <td><?= $product['title'] ?></td>
                                             <td><?= $product['display_name'] ?></td>
+                                            <td ><img src="<?= $product['image'] ;?>" alt="Girl in a jacket" width="60" height="60"/></td>
                                             <td><?= $product['description'] ?></td>
                                             <td><?= $product['price'] ?></td>
                                             <td><?= $product['published'] ?></td>

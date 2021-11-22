@@ -112,4 +112,8 @@ return [
             //'headerCharset' => 'utf-8',
         ]
     ],
+
+    'DebugKit' => [
+        'forceEnable' => true,
+    ]
 ];
