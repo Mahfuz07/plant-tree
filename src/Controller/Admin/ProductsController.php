@@ -21,6 +21,7 @@ class ProductsController extends AppController
         $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit']);
         $this->Categories = $this->getDbTable('Categories');
         $this->Products = $this->getDbTable('Products');
+        $this->ProductImages = $this->getDbTable('ProductImages');
     }
 
     public function index() {
@@ -46,6 +47,33 @@ class ProductsController extends AppController
                     $products = $this->Products->patchEntity($products, $requestData);
                     $products = $this->Products->save($products);
                     if ($products->id) {
+
+                        $extension=array("jpeg","jpg","png");
+                        foreach($requestData["upload_image"] as $key=>$tmp_name) {
+                            $file_name= $tmp_name->getClientFilename();
+                            $ext = pathinfo($file_name,PATHINFO_EXTENSION);
+
+                            $image_name = $key . '-' .$requestData['slug'] . '-' . strtotime(date('Y-m-d H:i:s'));
+                            $targetPath = WWW_ROOT . 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
+
+                            if(in_array($ext,$extension)) {
+                                if(!file_exists($targetPath)) {
+                                    $tmp_name->moveTo($targetPath);
+                                    $productImages = $this->ProductImages->newEmptyEntity();
+                                    $productImage['product_id'] = $products->id;
+                                    $productImage['image_path'] = 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
+                                    $productImages = $this->ProductImages->patchEntity($productImages, $productImage);
+                                    $productImages = $this->ProductImages->save($productImages);
+                                } else {
+//                                $filename=basename($file_name,$ext);
+//                                $newFileName=$filename.time().".".$ext;
+//                                move_uploaded_file($file_tmp=$_FILES["files"]["tmp_name"][$key],"photo_gallery/".$txtGalleryName."/".$newFileName);
+                                }
+                            }
+                            else {
+                                array_push($error,"$file_name, ");
+                            }
+                        }
                         $this->Flash->success('Product has been saved!', ['key' => 'success']);
                         $this->redirect('/admin/dashboard');
                     } else {

@@ -70,23 +70,35 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="form-validation">
-                                <?php echo $this->Form->create(null, ['id' => 'user-password-form']); ?>
+                                <?php echo $this->Form->create(null, array('enctype'=>'multipart/form-data')); ?>
                                 <div class="form-valide" action="#" method="post">
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-Image">
                                         </label>
-                                        <div class="col-lg-6">
-                                            <div id="uploaded_image"></div>
-                                        </div>
+<!--                                        <div class="col-lg-6">-->
+<!--                                            <div id="uploaded_image"></div>-->
+<!--                                        </div>-->
 
                                     </div>
+<!--                                    <div class="form-group row">-->
+<!--                                        <label class="col-lg-4 col-form-label" for="val-Image">Image-->
+<!--<!--                                            <span class="text-danger">*</span>-->-->
+<!--                                        </label>-->
+<!--                                        <div class="col-lg-6">-->
+<!--                                            <div class="panel panel-default">-->
+<!--                                                <input type="file" name="upload_image" id="upload_image" data-toggle="modal" data-target="#basicModal"/>-->
+<!--                                            </div>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-Image">Image
-<!--                                            <span class="text-danger">*</span>-->
+                                            <!--                                            <span class="text-danger">*</span>-->
                                         </label>
                                         <div class="col-lg-6">
                                             <div class="panel panel-default">
-                                                <input type="file" name="upload_image" id="upload_image" data-toggle="modal" data-target="#basicModal"/>
+<!--                                                <input type="file" name="upload_image[]" multiple />-->
+                                                <?php echo $this->Form->input('upload_image[]', ['type' => 'file', 'label' => false, 'multiple' => true]); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -233,25 +245,25 @@
 
 </html>
 <!--id="uploadimageModal"-->
-<div class="modal fade" id="basicModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Crop & Upload Image</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <div id="image_demo" style="margin-top:30px"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary crop_image" data-dismiss="modal">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
+<!--<div class="modal fade" id="basicModal">-->
+<!--    <div class="modal-dialog">-->
+<!--        <div class="modal-content">-->
+<!--            <div class="modal-header">-->
+<!--                <h5 class="modal-title">Crop & Upload Image</h5>-->
+<!--                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--            <div class="modal-body">-->
+<!--                <div class="row">-->
+<!--                    <div class="col-md-12 text-center">-->
+<!--                        <div id="image_demo" style="margin-top:30px"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="modal-footer">-->
+<!--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+<!--                <button type="button" class="btn btn-primary crop_image" data-dismiss="modal">Save changes</button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->

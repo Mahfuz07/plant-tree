@@ -17,7 +17,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="/admin/products">Product</a></li>
-                    <li><a href="/admin/categories/add">Category</a></li>
+                    <li><a href="/admin/categories">Category</a></li>
                     <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
                     <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->
                     <!--                        <li><a href="./layout-vertical.html">Vertical</a></li>-->

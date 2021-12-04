@@ -3,7 +3,9 @@
 namespace App\Controller\Component;
 
 use Cake\Core\Configure;
+use Cake\Datasource\ConnectionManager;
 use Cake\Event\Event;
+use Cake\ORM\TableRegistry;
 
 class CommonFunctionComponent extends BaseComponent
 {
@@ -58,6 +60,44 @@ class CommonFunctionComponent extends BaseComponent
         curl_close($ch);
 
         return $user;
+    }
+
+    public function UserLoginDetailsSave($user_id, $udid, $device_name, $access_token, $refresh_token) {
+
+        if (empty($udid)) {
+            $udid = "empty";
+        }
+
+        if (empty($device_name)) {
+            $device_name = "empty";
+        }
+
+        $conn = ConnectionManager::get('default');
+        $sql = "INSERT INTO user_login_details SET user_id=" . $user_id . ", udid='". $udid . "', device_name='" . $device_name . "', access_token='" . $access_token . "', refresh_token='" . $refresh_token . "', login_status=" . 1;
+        $conn->query($sql);
+
+    }
+
+    public function getUserInfo () {
+
+        $accessToken = $this->controller->getRequest()->getHeader('Authorization');
+        $accessToken = explode('Bearer ', $accessToken[0]);
+
+        if(count($accessToken) == 2 && !empty($accessToken[1])) {
+
+            $userLoginDetails =  TableRegistry::getTableLocator()->get('UserLoginDetails');
+            $getUserLoginDetails = $userLoginDetails->find()
+                ->where([
+                    'access_token' => trim($accessToken[1])
+                ])->first();
+
+            $this->Users = $this->getDbTable('ManageUser.Users');
+            $getUserDetails = $this->Users->find()->where(['id' => $getUserLoginDetails['user_id']])->first();
+
+            return $getUserDetails;
+        } else {
+            return false;
+        }
     }
 
 }

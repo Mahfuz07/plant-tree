@@ -4,8 +4,10 @@ namespace App\Controller\Api;
 
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
+use Cake\Routing\Router;
 use Cake\Utility\Security;
 use ManageUser\Controller\AppController;
+use phpDocumentor\Reflection\Types\This;
 
 class LocalDevicesController extends AppController
 {
@@ -24,6 +26,7 @@ class LocalDevicesController extends AppController
         $this->Roles =  $this->getDbTable('ManageUser.Roles');
         $this->Categories = $this->getDbTable('Categories');
         $this->Products = $this->getDbTable('Products');
+        $this->ProductImages = $this->getDbTable('ProductImages');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -35,10 +38,10 @@ class LocalDevicesController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory'
         ]);
         $actions =  array(
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -65,17 +68,14 @@ class LocalDevicesController extends AppController
                     'status' => true
                 ])->first();
 
-//                dd($users);
                 if($users){
                     $users['Role'] = $this->Roles->find()->where([
                         'id' => $users['role_id']
                     ])->first();
 
                     $token = $this->AccessToken->getAccessToken();
-//                    dd($token);
-                        //set user login details
 
-//                        $this->getComponent('CommonFunction')->UserLoginDetailsSave($users['id'], $udid, $device_name, $token['access_token'], $users['university_id']);
+                        $this->getComponent('CommonFunction')->UserLoginDetailsSave($users['id'], $udid, $device_name, $token['access_token'], $token['refresh_token']);
 //                        $dataLogTable =  $this->getDbTable('UserLoginDetails');
 //                        $data_log_entities = $dataLogTable->newEmptyEntity();
 //                        $data_log_entities->user_id = $users['id'];
@@ -148,6 +148,13 @@ class LocalDevicesController extends AppController
             if(isset($refresh_token) && !empty($refresh_token)){
 
                 $result = $this->AccessToken->getTokenByRefreshToken($refresh_token);
+
+                $this->UserLoginDetails =  $this->getDbTable('UserLoginDetails');
+                $data_log_entities = $this->UserLoginDetails->find()->where(['refresh_token' => $refresh_token])->first();
+                $data_log['access_token'] = $result['access_token'];
+                $data_log['refresh_token'] = $result['refresh_token'];
+                $data_log_entities = $this->UserLoginDetails->patchEntity($data_log_entities, $data_log);
+                $this->UserLoginDetails->save($data_log_entities);
 
                 if(isset($result['error'])){
                     return $this->getResponse()
@@ -288,7 +295,23 @@ class LocalDevicesController extends AppController
         if ($this->AccessToken->verify()) {
             if ($this->request->is('get')) {
 
+                $fullUrl = Router::fullBaseUrl();
                 $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->toArray();
+
+                if (!empty($products)) {
+
+                    foreach ($products as $product) {
+                        $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
+                        if (!empty($images)) {
+                            $imageArray = [];
+                            foreach ($images as $image) {
+                                $imageArray[] = $fullUrl . '/' . $image['image_path'];
+                            }
+                            $product['image'] = $imageArray;
+                        }
+                    }
+
+                }
 
                 if (!empty($products)) {
                     return $this->getResponse()
@@ -340,7 +363,19 @@ class LocalDevicesController extends AppController
                 if (!empty($request_data)) {
                     $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
 
+                    $fullUrl = Router::fullBaseUrl();
                     $product = $this->Products->find()->where(['id' => $product_id, 'published' => 1])->first();
+
+                    if (!empty($product)) {
+                        $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
+                        if (!empty($images)) {
+                            $imageArray = [];
+                            foreach ($images as $image) {
+                                $imageArray[] = $fullUrl . '/' . $image['image_path'];
+                            }
+                            $product['image'] = $imageArray;
+                        }
+                    }
 
                     if (!empty($product)) {
                         return $this->getResponse()

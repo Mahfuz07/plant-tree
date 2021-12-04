@@ -68,6 +68,10 @@ return static function (RouteBuilder $routes) {
 
             $routes->connect('/categories/add', ['controller' => 'Categories',  'action' => 'add']);
 
+            $routes->connect('/categories/edit/*', ['controller' => 'Categories',  'action' => 'edit']);
+
+            $routes->connect('/categories', ['controller' => 'Categories',  'action' => 'index']);
+
             $routes->connect('/customers/check-email', ['controller' => 'Customers',  'action' => 'checkEmail']);
 
             $routes->connect('/logout', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'logout']);

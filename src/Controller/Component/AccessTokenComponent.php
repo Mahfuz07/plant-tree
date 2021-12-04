@@ -227,13 +227,18 @@ class AccessTokenComponent extends BaseComponent
     public function verify()
     {
         $accessToken = $this->controller->getRequest()->getHeader('Authorization');
-        $accessToken = explode('Bearer ', $accessToken[0]);
+        if (!empty($accessToken)) {
+            $accessToken = explode('Bearer ', $accessToken[0]);
 
-        if(count($accessToken) == 2 && !empty($accessToken[1])) {
-            return $this->tokenValidation($accessToken[1]);
-         }else{
-             return false;
-         }
+            if(count($accessToken) == 2 && !empty($accessToken[1])) {
+                return $this->tokenValidation($accessToken[1]);
+            }else{
+                return false;
+            }
+        } else {
+            return false;
+        }
+
     }
 
     public function updateUserLoginDetails($token=null, $status=0)
