@@ -4,15 +4,17 @@ namespace App\Controller\Api;
 
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
+use Cake\ORM\TableRegistry;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
 use ManageUser\Controller\AppController;
 use phpDocumentor\Reflection\Types\This;
+use Cake\Http\Response;
 
 class LocalDevicesController extends AppController
 {
 
-    public $default_components = ['AccessToken'];
+    public $default_components = ['AccessToken', 'Product'];
     public $mode;
 
     public function initialize(): void
@@ -27,6 +29,8 @@ class LocalDevicesController extends AppController
         $this->Categories = $this->getDbTable('Categories');
         $this->Products = $this->getDbTable('Products');
         $this->ProductImages = $this->getDbTable('ProductImages');
+        $this->ProductDeliveryAddress = $this->getDbTable('ProductDeliveryAddress');
+        $this->FavouritesProduct = $this->getDbTable('FavouritesProduct');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -38,10 +42,10 @@ class LocalDevicesController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory', 'getProduct', 'getAddress', 'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView'
         ]);
         $actions =  array(
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory', 'getProduct', 'getAddress', 'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -296,11 +300,22 @@ class LocalDevicesController extends AppController
             if ($this->request->is('get')) {
 
                 $fullUrl = Router::fullBaseUrl();
-                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->toArray();
+                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderDesc('id')->toArray();
+
+                $getUser = $this->getComponent('CommonFunction')->getUserInfo();
 
                 if (!empty($products)) {
 
                     foreach ($products as $product) {
+
+                        $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product['id'], 'user_id' => $getUser['id']])->first();
+
+                        if (!empty($getFavoriteProduct)) {
+                            $product['favorite'] = true;
+                        } else {
+                            $product['favorite'] = false;
+                        }
+
                         $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
                         if (!empty($images)) {
                             $imageArray = [];
@@ -355,16 +370,28 @@ class LocalDevicesController extends AppController
     public function getProduct() {
 
         if ($this->AccessToken->verify()) {
+
             if ($this->request->is('post')) {
+
                 $request_data = file_get_contents("php://input");
                 $request_data = $this->json_decode($request_data, true);
                 $this->log($request_data);
 
                 if (!empty($request_data)) {
                     $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
+                    $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id']:'';
 
                     $fullUrl = Router::fullBaseUrl();
                     $product = $this->Products->find()->where(['id' => $product_id, 'published' => 1])->first();
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product['id'], 'user_id' => $getUser['id']])->first();
+
+                    if (!empty($getFavoriteProduct)) {
+                        $product['favorite'] = true;
+                    } else {
+                        $product['favorite'] = false;
+                    }
 
                     if (!empty($product)) {
                         $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
@@ -376,6 +403,8 @@ class LocalDevicesController extends AppController
                             $product['image'] = $imageArray;
                         }
                     }
+
+                    $this->getComponent('Product')->recentlyViewSave($product_id, $getUser['id']);
 
                     if (!empty($product)) {
                         return $this->getResponse()
@@ -392,6 +421,296 @@ class LocalDevicesController extends AppController
                             ->withStringBody(json_encode(array(
                                 'status' => 'success',
                                 'msg' => 'Product Not Published',
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing Input Data!',
+                            'mode' => $this->mode)));
+                }
+
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getAddress(): Response {
+
+        if ($this->AccessToken->verify()) {
+            if ($this->request->is('get')) {
+
+                $fullUrl = Router::fullBaseUrl();
+                $productDeliveryAddress = $this->ProductDeliveryAddress->find()->all()->toArray();
+
+                if (!empty($productDeliveryAddress)) {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'address_list' => $productDeliveryAddress,
+                            'mode' => $this->mode)));
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'msg' => 'Product Not Published',
+                            'mode' => $this->mode)));
+                }
+
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function addToFavouriteProduct(): Response {
+
+        if($this->request->is('post')){
+
+            $request_data = file_get_contents("php://input");
+            $request_data = $this->json_decode($request_data, true);
+            $this->log($request_data);
+
+            if (!empty($request_data)) {
+
+                $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
+                $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id']:'';
+                $favourite = isset($request_data['Product']['favourite']) ? $request_data['Product']['favourite']:'';
+
+                $errorMessage = [];
+                if (empty($product_id)) {
+                    $errorMessage[] = ['Required field product id is missing'];
+                }
+                if (empty($user_id)) {
+                    $errorMessage[] = ['Required field user id is missing'];
+                }
+                if (empty($favourite)) {
+                    $errorMessage[] = ['Required favourite is missing'];
+                }
+
+                if (empty($user_id)) {
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                    $user_id = $getUser['id'];
+                }
+
+                $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product_id, 'user_id' => $user_id])->first();
+
+                if (!empty($getFavoriteProduct)) {
+                    if ($this->FavouritesProduct->delete($getFavoriteProduct)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'msg' => true,
+                                'mode' => $this->mode)));
+                    }
+                }
+
+                $getFavourite = $this->getComponent('Product')->saveFavouritesProduct($product_id, $user_id, $favourite);
+
+                if (!empty($getFavourite)) {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'msg' => true,
+                            'mode' => $this->mode)));
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(404)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => $errorMessage,
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        }else{
+            return $this->getResponse()
+                ->withStatus(200)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid request method',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getFavouriteProducts(): Response {
+        if ($this->AccessToken->verify()) {
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id']:'';
+
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    $products = $this->Products->find()->where(['id in (SELECT product_id FROM favourites_product WHERE user_id = '.$getUser['id'].')', 'published' => 1])->orderDesc('id')->toArray();
+
+                    $fullUrl = Router::fullBaseUrl();
+                    foreach ($products as $product) {
+                        $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
+                        if (!empty($images)) {
+                            $imageArray = [];
+                            foreach ($images as $image) {
+                                $imageArray[] = $fullUrl . '/' . $image['image_path'];
+                                break;
+                            }
+                            $product['image'] = $imageArray;
+                        }
+                        $product['favorite'] = true;
+                    }
+
+                    if (!empty($products)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'products' => $products,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'msg' => 'No products have been released yet.',
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing Input Data!',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getRecentlyView(): Response {
+
+        if ($this->AccessToken->verify()) {
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id'] : '';
+
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                    $products = $this->Products->find()->where(['id in (SELECT product_id FROM product_recently_view WHERE user_id = ' . $getUser['id'] . ' order by date_time desc)', 'published' => 1])->orderDesc('id')->limit(20)->toArray();
+
+                    $fullUrl = Router::fullBaseUrl();
+                    foreach ($products as $product) {
+
+                        $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product['id'], 'user_id' => $getUser['id']])->first();
+                        if (!empty($getFavoriteProduct)) {
+                            $product['favorite'] = true;
+                        } else {
+                            $product['favorite'] = false;
+                        }
+
+                        $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
+                        if (!empty($images)) {
+                            $imageArray = [];
+                            foreach ($images as $image) {
+                                $imageArray[] = $fullUrl . '/' . $image['image_path'];
+                                break;
+                            }
+                            $product['image'] = $imageArray;
+                        }
+                    }
+
+                    if (!empty($products)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'products' => $products,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'msg' => 'No products have been released yet.',
                                 'mode' => $this->mode)));
                     }
                 } else {

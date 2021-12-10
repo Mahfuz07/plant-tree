@@ -22,6 +22,7 @@ class CheckoutController extends AppController
         $this->Roles =  $this->getDbTable('ManageUser.Roles');
         $this->Categories = $this->getDbTable('Categories');
         $this->Products = $this->getDbTable('Products');
+        $this->OrderSessions = $this->getDbTable('OrderSessions');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -33,16 +34,53 @@ class CheckoutController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser'
+            'index'
         ]);
         $actions =  array(
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct'
+            'index'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
 
     public function index () {
-        $this->getDbTable();
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
+
+                if (!empty($getOrderSession)) {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'order_session' => json_decode($getOrderSession['session_order']),
+                            'mode' => $this->mode)));
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'msg' => 'Cart Empty!',
+                            'mode' => $this->mode)));
+                }
+            }
+
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
     }
 
 }
