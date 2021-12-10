@@ -96,11 +96,6 @@ return static function (RouteBuilder $routes) {
         $routes->setExtensions(['json', 'xml']);
         $routes->fallbacks('InflectedRoute');
 
-        //device apis
-//    $routes->connect('/users/users/get_token_by_refresh_token', ['controller' => 'LocalDevices', 'action' => 'getToken']);
-//    $routes->connect('/users/users/api_user_login/staff', ['controller' => 'LocalDevices', 'action' => 'login']);
-
-
         //internal software apis
         $routes->connect('/users/api-user-login', ['controller' => 'LocalDevices', 'action' => 'login']);
         $routes->connect('/users/create-user', ['controller' => 'LocalDevices', 'action' => 'createUser']);
@@ -115,6 +110,8 @@ return static function (RouteBuilder $routes) {
 
 
         $routes->connect('/checkout', ['controller' => 'Checkout', 'action' => 'index']);
+        $routes->connect('/cart/add', ['controller' => 'Cart', 'action' => 'add']);
+        $routes->connect('/cart/change', ['controller' => 'Cart', 'action' => 'change']);
 
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);

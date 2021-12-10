@@ -25,7 +25,7 @@ class CartComponent extends BaseComponent
 
     function getCurrentAddToCartProductInfo ($data) {
 
-        $product_id = $data['product']['product_id'];
+        $product_id = $data['Product']['product_id'];
 
         $productData = $this->Products->find()->where(['products.id' => $product_id])->first();
 
@@ -36,10 +36,10 @@ class CartComponent extends BaseComponent
             $_SESSION['Message']['flash']['message']    =   'No Product Found.';
         }
 
-        if(empty($data['product']['product_quantity']) || $data['product']['product_quantity'] <= 0){
+        if(empty($data['Product']['product_quantity']) || $data['Product']['product_quantity'] <= 0){
             $quantity = 1;
         }else{
-            $quantity = $data['product']['product_quantity'];
+            $quantity = $data['Product']['product_quantity'];
         }
 
         $productInfo['id'] = $productData['id'];
@@ -50,8 +50,8 @@ class CartComponent extends BaseComponent
         $productInfo['price'] = intval($productData['price']);
         $productInfo['final_price'] = (intval($productData['price']) * $quantity);
 
-        if (!empty($data['product']['product_delivery_address_id'])) {
-            $ProductDeliveryAddress = $this->ProductDeliveryAddress->find()->where(['id' => $data['product']['product_delivery_address_id']])->first();
+        if (!empty($data['Product']['product_delivery_address_id'])) {
+            $ProductDeliveryAddress = $this->ProductDeliveryAddress->find()->where(['id' => $data['Product']['product_delivery_address_id']])->first();
             if (!empty($ProductDeliveryAddress)) {
                 $productInfo['product_delivery_address_id'] = $ProductDeliveryAddress->id;
                 $productInfo['product_delivery_address'] = json_decode($ProductDeliveryAddress);
