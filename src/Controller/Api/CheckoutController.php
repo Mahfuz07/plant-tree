@@ -46,29 +46,51 @@ class CheckoutController extends AppController
 
         if ($this->AccessToken->verify()) {
 
-            if ($this->request->is('post')) {
 
-                $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+            if ($this->request->is('get')) {
+                $request_data = $this->request->getQueryParams();
 
-                $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id'] : '';
 
-                if (!empty($getOrderSession)) {
-                    return $this->getResponse()
-                        ->withStatus(200)
-                        ->withType('application/json')
-                        ->withStringBody(json_encode(array(
-                            'status' => 'success',
-                            'order_session' => json_decode($getOrderSession['session_order']),
-                            'mode' => $this->mode)));
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
+
+                    if (!empty($getOrderSession)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'order_session' => json_decode($getOrderSession['session_order']),
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'msg' => 'Cart Empty!',
+                                'mode' => $this->mode)));
+                    }
                 } else {
                     return $this->getResponse()
                         ->withStatus(200)
                         ->withType('application/json')
                         ->withStringBody(json_encode(array(
-                            'status' => 'success',
-                            'msg' => 'Cart Empty!',
+                            'status' => 'error',
+                            'msg' => 'Missing Input Data!',
                             'mode' => $this->mode)));
                 }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
             }
 
         } else {
