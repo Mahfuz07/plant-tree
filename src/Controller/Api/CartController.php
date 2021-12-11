@@ -264,7 +264,7 @@ class CartController extends AppController
                             $orderSession->final_price = $calcutePrice['final_price'];
                             $index = $key;
                             $getProducts->products[$key] = $orderSession;
-                            $orderInfo = $this->orderInfo(json_encode($getProducts->products));
+                            $orderInfo = $this->orderInfo(json_decode(json_encode($getProducts->products)));
                             $getProducts->info = $orderInfo;
                             $updateOrderSession['session_order'] = json_encode($getProducts);
                             $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
@@ -279,9 +279,9 @@ class CartController extends AppController
 
                     if ($cartProductNotExit) {
                         $getProducts->products[count($getProducts->products)] = $data;
-                        $orderInfo = $this->orderInfo(json_decode($getProducts->products));
+                        $orderInfo = $this->orderInfo(json_decode(json_encode($getProducts->products)));
                         $getProducts->info = $orderInfo;
-                        $updateOrderSession['session_order'] = json_decode($getProducts);
+                        $updateOrderSession['session_order'] = json_encode($getProducts);
                         $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
                         $getOrderSession = $this->OrderSessions->save($getOrderSession);
                         if (!empty($getOrderSession)) {
@@ -324,7 +324,7 @@ class CartController extends AppController
 
         if (!empty($products)) {
 
-            $products = json_decode($products);
+//            $products = $products;
             $total_price = 0;
             foreach ($products as $product) {
                 $total_price += intval($product->final_price);
