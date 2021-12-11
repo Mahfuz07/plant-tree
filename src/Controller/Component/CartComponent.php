@@ -63,7 +63,7 @@ class CartComponent extends BaseComponent
 
     public function calculatePrice($cartData , $newAddToCartData) {
 
-        $productData = $this->Products->find()->where(['products.id' => $newAddToCartData['id']])->first();
+        $productData = $this->Products->find()->where(['id' => $newAddToCartData['id']])->first();
         if (!empty($productData)) {
 
             $cartFinalPriceQuantity = [];
