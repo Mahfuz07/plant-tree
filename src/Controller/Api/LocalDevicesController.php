@@ -31,6 +31,7 @@ class LocalDevicesController extends AppController
         $this->ProductImages = $this->getDbTable('ProductImages');
         $this->ProductDeliveryAddress = $this->getDbTable('ProductDeliveryAddress');
         $this->FavouritesProduct = $this->getDbTable('FavouritesProduct');
+        $this->ProductRecentlyView = TableRegistry::getTableLocator()->get('ProductRecentlyView');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -371,15 +372,13 @@ class LocalDevicesController extends AppController
 
         if ($this->AccessToken->verify()) {
 
-            if ($this->request->is('post')) {
+            if ($this->request->is('get')) {
 
-                $request_data = file_get_contents("php://input");
-                $request_data = $this->json_decode($request_data, true);
-                $this->log($request_data);
+                $request_data = $this->request->getQueryParams();
 
                 if (!empty($request_data)) {
-                    $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
-                    $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id']:'';
+                    $product_id = isset($request_data['product_id']) ? $request_data['product_id']:'';
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id']:'';
 
                     $fullUrl = Router::fullBaseUrl();
                     $product = $this->Products->find()->where(['id' => $product_id, 'published' => 1])->first();
@@ -586,11 +585,9 @@ class LocalDevicesController extends AppController
 
     public function getFavouriteProducts(): Response {
         if ($this->AccessToken->verify()) {
-            if ($this->request->is('post')) {
+            if ($this->request->is('get')) {
 
-                $request_data = file_get_contents("php://input");
-                $request_data = $this->json_decode($request_data, true);
-                $this->log($request_data);
+                $request_data = $this->request->getQueryParams();
 
                 if (!empty($request_data)) {
                     $user_id = isset($request_data['user_id']) ? $request_data['user_id']:'';
@@ -663,20 +660,36 @@ class LocalDevicesController extends AppController
     public function getRecentlyView(): Response {
 
         if ($this->AccessToken->verify()) {
-            if ($this->request->is('post')) {
+            if ($this->request->is('get')) {
 
-                $request_data = file_get_contents("php://input");
-                $request_data = $this->json_decode($request_data, true);
-                $this->log($request_data);
+                $request_data = $this->request->getQueryParams();
 
                 if (!empty($request_data)) {
                     $user_id = isset($request_data['user_id']) ? $request_data['user_id'] : '';
 
                     $getUser = $this->getComponent('CommonFunction')->getUserInfo();
-                    $products = $this->Products->find()->where(['id in (SELECT product_id FROM product_recently_view WHERE user_id = ' . $getUser['id'] . ' order by date_time desc)', 'published' => 1])->orderDesc('id')->limit(20)->toArray();
+//                    $products = $this->Products->find()->where(['id in (SELECT product_id FROM product_recently_view WHERE user_id = ' . $getUser['id'] . ' order by date_time asc)', 'published' => 1])->limit(20)->toArray();
+//                    $products = $this->ProductRecentlyView->find()->where(['id in (SELECT id FROM products WHERE id in (SELECT product_id FROM product_recently_view WHERE user_id = ' . $getUser['id'] . ' order by date_time asc))', 'published' => 1])->orderDesc('date_time')->limit(20)->toArray();
+//                     $join = array(
+//                         'table' => $this->ProductRecentlyView,
+//                         'alias' => 'ProductRecentlyView',
+//                         'type' => 'LEFT',
+//                         'confitions' => array('Products.id = ProductRecentlyView.product_id')
+//                     );
+
+                    $connection = ConnectionManager::get('default');
+
+                    $sql = 'SELECT Products.id, Products.category_id, Products.title title, Products.display_name, Products.image, Products.slug, Products.description, Products.price, Products.published
+                            FROM products Products
+                            LEFT JOIN product_recently_view recentlyView
+                            ON Products.id = recentlyView.product_id
+                            WHERE
+                            recentlyView.user_id = ' . $getUser['id'] . ' ORDER BY recentlyView.date_time desc ;';
+
+                    $products = $connection->execute($sql)->fetchAll('assoc');
 
                     $fullUrl = Router::fullBaseUrl();
-                    foreach ($products as $product) {
+                    foreach ($products as $key => $product) {
 
                         $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product['id'], 'user_id' => $getUser['id']])->first();
                         if (!empty($getFavoriteProduct)) {
@@ -694,6 +707,7 @@ class LocalDevicesController extends AppController
                             }
                             $product['image'] = $imageArray;
                         }
+                        $products[$key] = $product;
                     }
 
                     if (!empty($products)) {
