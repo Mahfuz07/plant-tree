@@ -27,7 +27,7 @@ class CartComponent extends BaseComponent
 
         $product_id = $data['Product']['product_id'];
 
-        $productData = $this->Products->find()->where(['products.id' => $product_id])->first();
+        $productData = $this->Products->find()->where(['id' => $product_id])->first();
 
         $productInfo = [];
         if (!empty($productData)) {
@@ -58,7 +58,6 @@ class CartComponent extends BaseComponent
             }
         }
 
-//        dd($productInfo);
         return $productInfo;
     }
 

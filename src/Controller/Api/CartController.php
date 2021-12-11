@@ -56,27 +56,58 @@ class CartController extends AppController
                 $request_data = $this->json_decode($request_data, true);
 
                 if (!empty($request_data)) {
-                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
 
-                    $current_product_info = $this->getComponent('Cart')->getCurrentAddToCartProductInfo($request_data);
+                    $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
+                    $product_slug = isset($request_data['Product']['product_slug']) ? $request_data['Product']['product_slug']:'';
+                    $product_quantity = isset($request_data['Product']['product_quantity']) ? $request_data['Product']['product_quantity']:'';
+                    $product_delivery_address_id = isset($request_data['Product']['product_delivery_address_id']) ? $request_data['Product']['product_delivery_address_id']:'';
+
+                    $errorMessage = [];
+                    if (empty($product_id)) {
+                        $errorMessage[] = ['Required field product id is missing'];
+                    }
+                    if (empty($product_slug)) {
+                        $errorMessage[] = ['Required field product slug is missing'];
+                    }
+                    if (empty($product_quantity)) {
+                        $errorMessage[] = ['Required field product quantity is missing'];
+                    }
+                    if (empty($product_delivery_address_id)) {
+                        $errorMessage[] = ['Required field product delivery address id is missing'];
+                    }
+
+                    if (count($errorMessage) == 0) {
+
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                        $current_product_info = $this->getComponent('Cart')->getCurrentAddToCartProductInfo($request_data);
 
                     $setCart = $this->cartSet($current_product_info, $getUser, 'products');
 
-                    if (!empty($setCart)) {
-                        return $this->getResponse()
-                            ->withStatus(200)
-                            ->withType('application/json')
-                            ->withStringBody(json_encode(array(
-                                'status' => 'success',
-                                'products' => $setCart,
-                                'mode' => $this->mode)));
+                        if (!empty($setCart)) {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'products' => json_decode($setCart['session_order']),
+                                    'mode' => $this->mode)));
+                        } else {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'error',
+                                    'msg' => 'Invalid Data.',
+                                    'mode' => $this->mode)));
+                        }
                     } else {
                         return $this->getResponse()
-                            ->withStatus(200)
+                            ->withStatus(404)
                             ->withType('application/json')
                             ->withStringBody(json_encode(array(
                                 'status' => 'error',
-                                'msg' => 'Invalid Data.',
+                                'msg' => $errorMessage,
                                 'mode' => $this->mode)));
                     }
                 } else {
@@ -248,9 +279,9 @@ class CartController extends AppController
 
                     if ($cartProductNotExit) {
                         $getProducts->products[count($getProducts->products)] = $data;
-                        $orderInfo = $this->orderInfo(json_encode($getProducts->products));
+                        $orderInfo = $this->orderInfo(json_decode($getProducts->products));
                         $getProducts->info = $orderInfo;
-                        $updateOrderSession['session_order'] = json_encode($getProducts);
+                        $updateOrderSession['session_order'] = json_decode($getProducts);
                         $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
                         $getOrderSession = $this->OrderSessions->save($getOrderSession);
                         if (!empty($getOrderSession)) {
