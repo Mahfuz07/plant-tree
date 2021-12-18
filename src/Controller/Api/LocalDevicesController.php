@@ -31,7 +31,8 @@ class LocalDevicesController extends AppController
         $this->ProductImages = $this->getDbTable('ProductImages');
         $this->ProductDeliveryAddress = $this->getDbTable('ProductDeliveryAddress');
         $this->FavouritesProduct = $this->getDbTable('FavouritesProduct');
-        $this->ProductRecentlyView = TableRegistry::getTableLocator()->get('ProductRecentlyView');
+        $this->ProductRecentlyView = $this->getDbTable('ProductRecentlyView');
+        $this->ProductDeliveryAddress = $this->getDbTable('ProductDeliveryAddress');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -43,10 +44,12 @@ class LocalDevicesController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory', 'getProduct', 'getAddress', 'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory', 'getProduct', 'getAddress',
+            'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress'
         ]);
         $actions =  array(
-            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory', 'getProduct', 'getAddress', 'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView'
+            'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory', 'getProduct', 'getAddress',
+            'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -458,8 +461,8 @@ class LocalDevicesController extends AppController
         if ($this->AccessToken->verify()) {
             if ($this->request->is('get')) {
 
-                $fullUrl = Router::fullBaseUrl();
-                $productDeliveryAddress = $this->ProductDeliveryAddress->find()->all()->toArray();
+                $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                $productDeliveryAddress = $this->ProductDeliveryAddress->find()->where(['user_id="' . $getUser['id'].'" OR user_id IS NULL'])->toArray();
 
                 if (!empty($productDeliveryAddress)) {
                     return $this->getResponse()
@@ -502,38 +505,53 @@ class LocalDevicesController extends AppController
 
     public function addToFavouriteProduct(): Response {
 
-        if($this->request->is('post')){
+        if ($this->AccessToken->verify()) {
 
-            $request_data = file_get_contents("php://input");
-            $request_data = $this->json_decode($request_data, true);
-            $this->log($request_data);
+            if ($this->request->is('post')) {
 
-            if (!empty($request_data)) {
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
 
-                $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
-                $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id']:'';
-                $favourite = isset($request_data['Product']['favourite']) ? $request_data['Product']['favourite']:'';
+                if (!empty($request_data)) {
 
-                $errorMessage = [];
-                if (empty($product_id)) {
-                    $errorMessage[] = ['Required field product id is missing'];
-                }
-                if (empty($user_id)) {
-                    $errorMessage[] = ['Required field user id is missing'];
-                }
-                if (empty($favourite)) {
-                    $errorMessage[] = ['Required favourite is missing'];
-                }
+                    $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id'] : '';
+                    $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id'] : '';
+                    $favourite = isset($request_data['Product']['favourite']) ? $request_data['Product']['favourite'] : '';
 
-                if (empty($user_id)) {
-                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
-                    $user_id = $getUser['id'];
-                }
+                    $errorMessage = [];
+                    if (empty($product_id)) {
+                        $errorMessage[] = ['Required field product id is missing'];
+                    }
+                    if (empty($user_id)) {
+                        $errorMessage[] = ['Required field user id is missing'];
+                    }
+                    if (empty($favourite)) {
+                        $errorMessage[] = ['Required favourite is missing'];
+                    }
 
-                $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product_id, 'user_id' => $user_id])->first();
+                    if (empty($user_id)) {
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                        $user_id = $getUser['id'];
+                    }
 
-                if (!empty($getFavoriteProduct)) {
-                    if ($this->FavouritesProduct->delete($getFavoriteProduct)) {
+                    $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product_id, 'user_id' => $user_id])->first();
+
+                    if (!empty($getFavoriteProduct)) {
+                        if ($this->FavouritesProduct->delete($getFavoriteProduct)) {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'msg' => true,
+                                    'mode' => $this->mode)));
+                        }
+                    }
+
+                    $getFavourite = $this->getComponent('Product')->saveFavouritesProduct($product_id, $user_id, $favourite);
+
+                    if (!empty($getFavourite)) {
                         return $this->getResponse()
                             ->withStatus(200)
                             ->withType('application/json')
@@ -541,26 +559,22 @@ class LocalDevicesController extends AppController
                                 'status' => 'success',
                                 'msg' => true,
                                 'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => $errorMessage,
+                                'mode' => $this->mode)));
                     }
-                }
-
-                $getFavourite = $this->getComponent('Product')->saveFavouritesProduct($product_id, $user_id, $favourite);
-
-                if (!empty($getFavourite)) {
+                } else {
                     return $this->getResponse()
                         ->withStatus(200)
                         ->withType('application/json')
                         ->withStringBody(json_encode(array(
-                            'status' => 'success',
-                            'msg' => true,
-                            'mode' => $this->mode)));
-                } else {
-                    return $this->getResponse()
-                        ->withStatus(404)
-                        ->withType('application/json')
-                        ->withStringBody(json_encode(array(
                             'status' => 'error',
-                            'msg' => $errorMessage,
+                            'msg' => 'Invalid request method',
                             'mode' => $this->mode)));
                 }
             } else {
@@ -572,13 +586,14 @@ class LocalDevicesController extends AppController
                         'msg' => 'Invalid request method',
                         'mode' => $this->mode)));
             }
-        }else{
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
             return $this->getResponse()
-                ->withStatus(200)
+                ->withStatus(401)
                 ->withType('application/json')
                 ->withStringBody(json_encode(array(
                     'status' => 'error',
-                    'msg' => 'Invalid request method',
+                    'msg' => 'Invalid access token.',
                     'mode' => $this->mode)));
         }
     }
@@ -737,6 +752,274 @@ class LocalDevicesController extends AppController
                             'mode' => $this->mode)));
                 }
 
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function profileImageChange () {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = $this->request->getData();
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $image = isset($request_data['image']) ? $request_data['image'] : '';
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id'] : '';
+
+                    $errorMessage = [];
+                    if (empty($image)) {
+                        $errorMessage[] = ['Required field image is missing'];
+                    }
+                    if (empty($user_id)) {
+                        $errorMessage[] = ['Required field user id is missing'];
+                    }
+
+                    if (count($errorMessage) == 0) {
+                        $fullUrl = Router::fullBaseUrl();
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                        $users = $this->Users->find()->where(['id' => $getUser['id']])->first();
+
+                        if (!empty($users['image'])) {
+                            unlink(WWW_ROOT . $users['image']);
+                        }
+                        $extension=array("jpeg","jpg","png");
+                        $file_name= $image->getClientFilename();
+                        $ext = pathinfo($file_name,PATHINFO_EXTENSION);
+
+                        $image_name = $users['id'] . '-main-image-' . strtotime(date('Y-m-d H:i:s'));
+                        $targetPath = WWW_ROOT . 'img' . DS . 'profile_images' . DS . $image_name . '.' . $ext;
+
+                        if(in_array($ext,$extension)) {
+                            if(!file_exists($targetPath)) {
+                                $image->moveTo($targetPath);
+                                $saveImage['image'] = 'img' . DS . 'profile_images' . DS . $image_name . '.' . $ext;
+                                $users = $this->Users->patchEntity($users, $saveImage);
+                                $getUserInfo = $this->Users->save($users);
+                                if ($getUserInfo->id) {
+
+                                    $getUserInfo['image'] = $fullUrl . '/' . $getUserInfo['image'];
+                                    return $this->getResponse()
+                                        ->withStatus(200)
+                                        ->withType('application/json')
+                                        ->withStringBody(json_encode(array(
+                                            'status' => 'success',
+                                            'user' => $getUserInfo,
+                                            'mode' => $this->mode)));
+
+                                } else {
+                                    return $this->getResponse()
+                                        ->withStatus(404)
+                                        ->withType('application/json')
+                                        ->withStringBody(json_encode(array(
+                                            'status' => 'error',
+                                            'msg' => 'Not Save!',
+                                            'mode' => $this->mode)));
+                                }
+                            }
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => $errorMessage,
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Invalid request method',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function updateProfileInfo () {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['User']['user_id']) ? $request_data['User']['user_id'] : '';
+                    $display_name = isset($request_data['User']['display_name']) ? $request_data['User']['display_name'] : '';
+                    $phone_no = isset($request_data['User']['phone_no']) ? $request_data['User']['phone_no'] : '';
+                    $address = isset($request_data['User']['address']) ? $request_data['User']['address'] : '';
+                    $bio = isset($request_data['User']['bio']) ? $request_data['User']['bio'] : '';
+
+                    $fullUrl = Router::fullBaseUrl();
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                    $users = $this->Users->find()->where(['id' => $getUser['id']])->first();
+                    if (!empty($users)) {
+                        $updateUserinfo['display_name'] = $display_name ?? '';
+                        $updateUserinfo['phone_no'] = $phone_no ?? '';
+                        $updateUserinfo['address'] = $address ?? '';
+                        $updateUserinfo['bio'] = $bio ?? '';
+                        $users = $this->Users->patchEntity($users, $updateUserinfo);
+                        $getUserInfo = $this->Users->save($users);
+                        if ($getUserInfo->id) {
+                            $getUserInfo['image'] = $fullUrl . '/' . $getUserInfo['image'] ?? '';
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'user' => $getUserInfo,
+                                    'mode' => $this->mode)));
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => 'User Not Exist!',
+                                'mode' => $this->mode)));
+                    }
+
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Invalid request method',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function saveAddress() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['Address']['user_id']) ? $request_data['Address']['user_id'] : '';
+                    $address_name = isset($request_data['Address']['name']) ? $request_data['Address']['name'] : '';
+
+                    $errorMessage = [];
+                    if (empty($user_id)) {
+                        $errorMessage[] = ['Required field user id is missing'];
+                    }
+                    if (empty($address_name)) {
+                        $errorMessage[] = ['Required field address name is missing'];
+                    }
+
+                    if (count($errorMessage) == 0) {
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                        $productDeliveryAddress = $this->ProductDeliveryAddress->find()->where(['user_id' => $getUser['id'], 'address_line' => $address_name])->first();
+                        if (empty($productDeliveryAddress)) {
+                            $productDeliveryAddress = $this->ProductDeliveryAddress->newEmptyEntity();
+                            $newAddress['user_id'] = $getUser['id'];
+                            $newAddress['address_line'] = $address_name;
+                            $productDeliveryAddress = $this->ProductDeliveryAddress->patchEntity($productDeliveryAddress, $newAddress);
+                            $getProductDeliveryAddress = $this->ProductDeliveryAddress->save($productDeliveryAddress);
+                            if ($getProductDeliveryAddress->id) {
+                                return $this->getResponse()
+                                    ->withStatus(200)
+                                    ->withType('application/json')
+                                    ->withStringBody(json_encode(array(
+                                        'status' => 'success',
+                                        'address' => $getProductDeliveryAddress,
+                                        'mode' => $this->mode)));
+                            }
+                        } else {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'error',
+                                    'msg' => 'Address Already Exist!',
+                                    'mode' => $this->mode)));
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => $errorMessage,
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Invalid request method',
+                            'mode' => $this->mode)));
+                }
             } else {
                 return $this->getResponse()
                     ->withStatus(200)

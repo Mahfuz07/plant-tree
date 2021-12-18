@@ -67,8 +67,8 @@ class CartComponent extends BaseComponent
         if (!empty($productData)) {
 
             $cartFinalPriceQuantity = [];
-            if(empty($cartData->quantity) || $cartData->quantity > 0){
-                $cartFinalPriceQuantity['quantity'] = (intval($cartData->quantity) + intval($newAddToCartData['quantity']));
+            if(empty($cartData['quantity']) || $cartData['quantity'] > 0){
+                $cartFinalPriceQuantity['quantity'] = (intval($cartData['quantity']) + intval($newAddToCartData['quantity']));
             }
 
             $cartFinalPriceQuantity['final_price'] = (intval($productData['price']) *$cartFinalPriceQuantity['quantity']);

@@ -153,6 +153,7 @@ class CartController extends AppController
 
                     $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
                     $product_slug = isset($request_data['Product']['product_slug']) ? $request_data['Product']['product_slug']:'';
+                    $action = isset($request_data['Product']['action']) ? $request_data['Product']['action']:'';
                     $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id']:'';
 
                     $getUser = $this->getComponent('CommonFunction')->getUserInfo();
@@ -161,35 +162,55 @@ class CartController extends AppController
 
                     if (!empty($getOrderSession)) {
 
-                        $getProducts = json_decode($getOrderSession['session_order']);
-                        foreach ($getProducts->products as $key=>$orderSession) {
-                            if ($orderSession->id == $product_id && $orderSession->slug == $product_slug) {
+                        $getProducts = $this->json_decode($getOrderSession['session_order'], true);
+                        foreach ($getProducts['products'] as $key=>$orderSession) {
+                            if ($orderSession['id'] == $product_id && $orderSession['slug'] == $product_slug) {
 
-                                if ($orderSession->quantity == 1) {
-                                    return $this->getResponse()
-                                        ->withStatus(200)
-                                        ->withType('application/json')
-                                        ->withStringBody(json_encode(array(
-                                            'status' => 'success',
-                                            'msg' => 'Already Quantity 1',
-                                            'mode' => $this->mode)));
-                                }
-                                $orderSession->quantity = ($orderSession->quantity - 1);
-                                $orderSession->final_price = ($orderSession->price * $orderSession->quantity);
-//                                $getProducts->products[$key] = $orderSession;
-                                $orderInfo = $this->orderInfo(json_encode($getProducts->products));
-                                $getProducts->info = $orderInfo;
-                                $updateOrderSession['session_order'] = json_encode($getProducts);
-                                $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
-                                $getOrderSession = $this->OrderSessions->save($getOrderSession);
-                                if (!empty($getOrderSession)) {
-                                    return $this->getResponse()
-                                        ->withStatus(200)
-                                        ->withType('application/json')
-                                        ->withStringBody(json_encode(array(
-                                            'status' => 'success',
-                                            'msg' => true,
-                                            'mode' => $this->mode)));
+                                if ($action == 'minus') {
+                                    if ($orderSession['quantity'] == 1) {
+                                        return $this->getResponse()
+                                            ->withStatus(200)
+                                            ->withType('application/json')
+                                            ->withStringBody(json_encode(array(
+                                                'status' => 'success',
+                                                'msg' => 'Already Quantity 1',
+                                                'mode' => $this->mode)));
+                                    }
+                                    $orderSession['quantity'] = ($orderSession['quantity'] - 1);
+                                    $orderSession['final_price'] = ($orderSession['price'] * $orderSession['quantity']);
+                                    $getProducts['products'][$key] = $orderSession;
+                                    $orderInfo = $this->orderInfo($getProducts['products']);
+                                    $getProducts['info'] = $orderInfo;
+                                    $updateOrderSession['session_order'] = json_encode($getProducts);
+                                    $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
+                                    $getOrderSession = $this->OrderSessions->save($getOrderSession);
+                                    if (!empty($getOrderSession)) {
+                                        return $this->getResponse()
+                                            ->withStatus(200)
+                                            ->withType('application/json')
+                                            ->withStringBody(json_encode(array(
+                                                'status' => 'success',
+                                                'msg' => true,
+                                                'mode' => $this->mode)));
+                                    }
+                                }elseif ($action == 'plus') {
+                                    $orderSession['quantity'] = ($orderSession['quantity'] + 1);
+                                    $orderSession['final_price'] = ($orderSession['price'] * $orderSession['quantity']);
+                                    $getProducts['products'][$key] = $orderSession;
+                                    $orderInfo = $this->orderInfo($getProducts['products']);
+                                    $getProducts['info'] = $orderInfo;
+                                    $updateOrderSession['session_order'] = json_encode($getProducts);
+                                    $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
+                                    $getOrderSession = $this->OrderSessions->save($getOrderSession);
+                                    if (!empty($getOrderSession)) {
+                                        return $this->getResponse()
+                                            ->withStatus(200)
+                                            ->withType('application/json')
+                                            ->withStringBody(json_encode(array(
+                                                'status' => 'success',
+                                                'msg' => true,
+                                                'mode' => $this->mode)));
+                                    }
                                 }
                             }
                         }
@@ -245,6 +266,117 @@ class CartController extends AppController
 
     public function remove() {
 
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+
+                    $product_id = isset($request_data['Product']['product_id']) ? $request_data['Product']['product_id']:'';
+                    $product_slug = isset($request_data['Product']['product_slug']) ? $request_data['Product']['product_slug']:'';
+//                    $action = isset($request_data['Product']['action']) ? $request_data['Product']['action']:'';
+                    $user_id = isset($request_data['Product']['user_id']) ? $request_data['Product']['user_id']:'';
+
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
+
+                    if (!empty($getOrderSession)) {
+
+                        $getProducts = $this->json_decode($getOrderSession['session_order'], true);
+                        if (count($getProducts['products']) == 1) {
+                            if ($this->OrderSessions->delete($getOrderSession)) {
+                                return $this->getResponse()
+                                    ->withStatus(200)
+                                    ->withType('application/json')
+                                    ->withStringBody(json_encode(array(
+                                        'status' => 'success',
+                                        'msg' => 'Cart Empty!',
+                                        'mode' => $this->mode)));
+                            }
+                        } else {
+                            foreach ($getProducts['products'] as $key=>$orderSession) {
+                                if ($orderSession['id'] == $product_id && $orderSession['slug'] == $product_slug) {
+
+                                    unset($getProducts['products'][$key]);
+                                    $getProducts['products'] = $this->json_decode(json_encode($getProducts['products']), true);
+                                    $orderInfo = $this->orderInfo($getProducts['products']);
+                                    $getProducts['info'] = $orderInfo;
+                                    $updateOrderSession['session_order'] = json_encode($getProducts);
+                                    $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
+                                    $getOrderSession = $this->OrderSessions->save($getOrderSession);
+                                    if (!empty($getOrderSession['session_order'])) {
+                                        return $this->getResponse()
+                                            ->withStatus(200)
+                                            ->withType('application/json')
+                                            ->withStringBody(json_encode(array(
+                                                'status' => 'success',
+                                                'cart' => json_decode($getOrderSession['session_order']),
+                                                'mode' => $this->mode)));
+                                    } else {
+                                        return $this->getResponse()
+                                            ->withStatus(200)
+                                            ->withType('application/json')
+                                            ->withStringBody(json_encode(array(
+                                                'status' => 'success',
+                                                'msg' => 'Cart Empty!',
+                                                'mode' => $this->mode)));
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
+
+                    if (!empty($setCart)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'products' => $setCart,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => 'Invalid Data.',
+                                'mode' => $this->mode)));
+                    }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing Input Data!',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
     }
 
     public function cartSet($data = array(), $userInfo, $type) {
@@ -256,16 +388,16 @@ class CartController extends AppController
                 if ($type == 'products') {
                     $index = '';
                     $cartProductNotExit = 0;
-                    $getProducts = json_decode($getOrderSession['session_order']);
-                    foreach ($getProducts->products as $key=>$orderSession) {
-                        if ($orderSession->slug == $data['slug']) {
+                    $getProducts = $this->json_decode($getOrderSession['session_order'], true);
+                    foreach ($getProducts['products'] as $key=>$orderSession) {
+                        if ($orderSession['slug'] == $data['slug']) {
                             $calcutePrice = $this->getComponent('Cart')->calculatePrice($orderSession, $data);
-                            $orderSession->quantity = $calcutePrice['quantity'];
-                            $orderSession->final_price = $calcutePrice['final_price'];
+                            $orderSession['quantity'] = $calcutePrice['quantity'];
+                            $orderSession['final_price'] = $calcutePrice['final_price'];
                             $index = $key;
-                            $getProducts->products[$key] = $orderSession;
-                            $orderInfo = $this->orderInfo(json_decode(json_encode($getProducts->products)));
-                            $getProducts->info = $orderInfo;
+                            $getProducts['products'][$key] = $orderSession;
+                            $orderInfo = $this->orderInfo($getProducts['products']);
+                            $getProducts['info'] = $orderInfo;
                             $updateOrderSession['session_order'] = json_encode($getProducts);
                             $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
                             $getOrderSession = $this->OrderSessions->save($getOrderSession);
@@ -278,9 +410,10 @@ class CartController extends AppController
                     }
 
                     if ($cartProductNotExit) {
-                        $getProducts->products[count($getProducts->products)] = $data;
-                        $orderInfo = $this->orderInfo(json_decode(json_encode($getProducts->products)));
-                        $getProducts->info = $orderInfo;
+//                        $getProducts['products'][count($getProducts['products'])] = $data;
+                        array_push($getProducts['products'], $data);
+                        $orderInfo = $this->orderInfo($getProducts['products']);
+                        $getProducts['info'] = $orderInfo;
                         $updateOrderSession['session_order'] = json_encode($getProducts);
                         $getOrderSession = $this->OrderSessions->patchEntity($getOrderSession, $updateOrderSession);
                         $getOrderSession = $this->OrderSessions->save($getOrderSession);
@@ -326,10 +459,13 @@ class CartController extends AppController
 
 //            $products = $products;
             $total_price = 0;
+            $total_quantity = 0;
             foreach ($products as $product) {
-                $total_price += intval($product->final_price);
+                $total_price += intval($product['final_price']);
+                $total_quantity += intval($product['quantity']);
             }
 
+            $info['total_plants'] = $total_quantity;
             $info['subtotal'] = $total_price;
             $info['total'] = $total_price;
             $info['date_purchased'] = date('Y-m-d h:i:s');
@@ -337,6 +473,7 @@ class CartController extends AppController
             return $info;
         }
         if (!empty($final_price)) {
+            $info['total_plants'] = 1;
             $info['subtotal'] = $final_price;
             $info['total'] = $final_price;
             $info['date_purchased'] = date('Y-m-d h:i:s');

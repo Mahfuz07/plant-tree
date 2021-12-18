@@ -100,6 +100,11 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/users/api-user-login', ['controller' => 'LocalDevices', 'action' => 'login']);
         $routes->connect('/users/create-user', ['controller' => 'LocalDevices', 'action' => 'createUser']);
         $routes->connect('/users/refresh-token', ['controller' => 'LocalDevices', 'action' => 'getTokenByRefreshToken']);
+        $routes->connect('/users/profile-image-change', ['controller' => 'LocalDevices', 'action' => 'profileImageChange']);
+        $routes->connect('/users/update-user-info', ['controller' => 'LocalDevices', 'action' => 'updateProfileInfo']);
+
+
+        $routes->connect('/address/save-address', ['controller' => 'LocalDevices', 'action' => 'saveAddress']);
 
         $routes->connect('/products/getAllProductsByCategory', ['controller' => 'LocalDevices', 'action' => 'getAllProductsByCategory']);
         $routes->connect('/products/getProduct', ['controller' => 'LocalDevices', 'action' => 'getProduct']);
@@ -112,6 +117,7 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/checkout', ['controller' => 'Checkout', 'action' => 'index']);
         $routes->connect('/cart/add', ['controller' => 'Cart', 'action' => 'add']);
         $routes->connect('/cart/change', ['controller' => 'Cart', 'action' => 'change']);
+        $routes->connect('/cart/remove', ['controller' => 'Cart', 'action' => 'remove']);
 
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);
