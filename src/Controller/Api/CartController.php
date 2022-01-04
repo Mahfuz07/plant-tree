@@ -428,7 +428,7 @@ class CartController extends AppController
                     if (!empty($data)) {
                         $cartInfo['products'] = [$data];
                         $cartInfo['user_info'] = $userInfo;
-                        $cartInfo['info'] = $this->orderInfo([], $data['final_price']);
+                        $cartInfo['info'] = $this->orderInfo([], $data);
                         $orderSessions = $this->OrderSessions->newEmptyEntity();
                         $orderSession['session_order'] = json_encode($cartInfo);
                         $orderSession['session_user_info'] = json_encode($userInfo);
@@ -472,10 +472,10 @@ class CartController extends AppController
 
             return $info;
         }
-        if (!empty($final_price)) {
-            $info['total_plants'] = 1;
-            $info['subtotal'] = $final_price;
-            $info['total'] = $final_price;
+        if (!empty($final_price['final_price'])) {
+            $info['total_plants'] = $final_price['quantity'];
+            $info['subtotal'] = $final_price['final_price'];
+            $info['total'] = $final_price['final_price'];
             $info['date_purchased'] = date('Y-m-d h:i:s');
 
             return $info;

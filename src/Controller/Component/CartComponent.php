@@ -4,6 +4,7 @@ namespace App\Controller\Component;
 
 use Cake\Event\Event;
 use Cake\ORM\TableRegistry;
+use Cake\Routing\Router;
 
 class CartComponent extends BaseComponent
 {
@@ -21,6 +22,7 @@ class CartComponent extends BaseComponent
 //        $this->Categories = $this->getDbTable('Categories');
         $this->Products = TableRegistry::getTableLocator()->get('Products');
         $this->ProductDeliveryAddress = TableRegistry::getTableLocator()->get('ProductDeliveryAddress');
+        $this->ProductImages = $this->getDbTable('ProductImages');
     }
 
     function getCurrentAddToCartProductInfo ($data) {
@@ -42,11 +44,18 @@ class CartComponent extends BaseComponent
             $quantity = $data['Product']['product_quantity'];
         }
 
+        $image = $this->ProductImages->find()->where(['product_id' => $productData['id']])->first();
+        if (!empty($image)) {
+            $fullUrl = Router::fullBaseUrl();
+            $productInfo['product_image'] = $fullUrl . '/' . $image['image_path'];
+        } else {
+            $productInfo['product_image'] = '';
+        }
+
         $productInfo['id'] = $productData['id'];
         $productInfo['quantity'] = $quantity;
         $productInfo['name'] = $productData['title'];
         $productInfo['slug'] = $productData['slug'];
-        $productInfo['product_image'] = '';
         $productInfo['price'] = intval($productData['price']);
         $productInfo['final_price'] = (intval($productData['price']) * $quantity);
 
