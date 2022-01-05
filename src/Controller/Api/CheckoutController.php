@@ -47,7 +47,7 @@ class CheckoutController extends AppController
         if ($this->AccessToken->verify()) {
 
 
-            if ($this->request->is('get')) {
+            if ($this->request->is('post')) {
                 $request_data = $this->request->getQueryParams();
 
                 if (!empty($request_data)) {

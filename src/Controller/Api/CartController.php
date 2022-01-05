@@ -302,7 +302,13 @@ class CartController extends AppController
                                 if ($orderSession['id'] == $product_id && $orderSession['slug'] == $product_slug) {
 
                                     unset($getProducts['products'][$key]);
-                                    $getProducts['products'] = $this->json_decode(json_encode($getProducts['products']), true);
+                                    $getProducts['products'] = $this->json_decode($this->json_encode($getProducts['products'], true),true);
+
+                                    $productArray = array();
+                                    foreach ($getProducts['products'] as $product) {
+                                        array_push($productArray, $product);
+                                    }
+                                    $getProducts['products'] = $productArray;
                                     $orderInfo = $this->orderInfo($getProducts['products']);
                                     $getProducts['info'] = $orderInfo;
                                     $updateOrderSession['session_order'] = json_encode($getProducts);
