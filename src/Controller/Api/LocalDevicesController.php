@@ -84,15 +84,6 @@ class LocalDevicesController extends AppController
                     $token = $this->AccessToken->getAccessToken();
 
                         $this->getComponent('CommonFunction')->UserLoginDetailsSave($users['id'], $udid, $device_name, $token['access_token'], $token['refresh_token']);
-//                        $dataLogTable =  $this->getDbTable('UserLoginDetails');
-//                        $data_log_entities = $dataLogTable->newEmptyEntity();
-//                        $data_log_entities->user_id = $users['id'];
-//                        $data_log_entities->created = date('Y-m-d H:i:s');
-//                        $data_log_entities->udid = $udid;
-//                        $data_log_entities->device_name = $device_name;
-//                        $data_log_entities->access_token = $token['access_token'];
-//                        $data_log_entities->login_status = (int)true;
-//                        $dataLogTable->save($data_log_entities);
 
                     $this->set(array(
                         'status' => 'success',
@@ -146,7 +137,6 @@ class LocalDevicesController extends AppController
             $request_data = $this->json_decode($request_data, true);
             $this->log($request_data);
 
-//            $this->Common->setLog(['request_refresh_token_get'=>$this->request->getQuery('university_id'), 'request_post'=>$request_data]);
             $refresh_token = $request_data['refresh_token'];
             $this->log('refresh token request :');
             $this->log($request_data);
@@ -301,7 +291,7 @@ class LocalDevicesController extends AppController
     public function getAllProductsByCategory() {
 
         if ($this->AccessToken->verify()) {
-            if ($this->request->is('get')) {
+            if ($this->request->is('post')) {
 
                 $fullUrl = Router::fullBaseUrl();
                 $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderDesc('id')->toArray();
@@ -329,7 +319,6 @@ class LocalDevicesController extends AppController
                             $product['image'] = $imageArray;
                         }
                     }
-
                 }
 
                 if (!empty($products)) {
@@ -346,7 +335,7 @@ class LocalDevicesController extends AppController
                         ->withType('application/json')
                         ->withStringBody(json_encode(array(
                             'status' => 'success',
-                            'msg' => 'No products have been released yet.',
+                            'products' => array(),
                             'mode' => $this->mode)));
                 }
 
@@ -375,7 +364,7 @@ class LocalDevicesController extends AppController
 
         if ($this->AccessToken->verify()) {
 
-            if ($this->request->is('get')) {
+            if ($this->request->is('post')) {
 
                 $request_data = $this->request->getQueryParams();
 
@@ -422,7 +411,7 @@ class LocalDevicesController extends AppController
                             ->withType('application/json')
                             ->withStringBody(json_encode(array(
                                 'status' => 'success',
-                                'msg' => 'Product Not Published',
+                                'products' => array(),
                                 'mode' => $this->mode)));
                     }
                 } else {
@@ -459,7 +448,7 @@ class LocalDevicesController extends AppController
     public function getAddress(): Response {
 
         if ($this->AccessToken->verify()) {
-            if ($this->request->is('get')) {
+            if ($this->request->is('post')) {
 
                 $getUser = $this->getComponent('CommonFunction')->getUserInfo();
                 $productDeliveryAddress = $this->ProductDeliveryAddress->find()->where(['user_id="' . $getUser['id'].'" OR user_id IS NULL'])->toArray();
@@ -478,7 +467,7 @@ class LocalDevicesController extends AppController
                         ->withType('application/json')
                         ->withStringBody(json_encode(array(
                             'status' => 'success',
-                            'msg' => 'Product Not Published',
+                            'address_list' => array(),
                             'mode' => $this->mode)));
                 }
 
@@ -600,7 +589,7 @@ class LocalDevicesController extends AppController
 
     public function getFavouriteProducts(): Response {
         if ($this->AccessToken->verify()) {
-            if ($this->request->is('get')) {
+            if ($this->request->is('post')) {
 
                 $request_data = $this->request->getQueryParams();
 
@@ -639,7 +628,7 @@ class LocalDevicesController extends AppController
                             ->withType('application/json')
                             ->withStringBody(json_encode(array(
                                 'status' => 'success',
-                                'msg' => 'No products have been released yet.',
+                                'products' => array(),
                                 'mode' => $this->mode)));
                     }
                 } else {
@@ -675,7 +664,7 @@ class LocalDevicesController extends AppController
     public function getRecentlyView(): Response {
 
         if ($this->AccessToken->verify()) {
-            if ($this->request->is('get')) {
+            if ($this->request->is('post')) {
 
                 $request_data = $this->request->getQueryParams();
 
@@ -739,7 +728,7 @@ class LocalDevicesController extends AppController
                             ->withType('application/json')
                             ->withStringBody(json_encode(array(
                                 'status' => 'success',
-                                'msg' => 'No products have been released yet.',
+                                'products' => array(),
                                 'mode' => $this->mode)));
                     }
                 } else {

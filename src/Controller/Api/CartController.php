@@ -98,7 +98,7 @@ class CartController extends AppController
                                 ->withType('application/json')
                                 ->withStringBody(json_encode(array(
                                     'status' => 'error',
-                                    'msg' => 'Invalid Data.',
+                                    'products' => array(),
                                     'mode' => $this->mode)));
                         }
                     } else {
@@ -294,7 +294,7 @@ class CartController extends AppController
                                     ->withType('application/json')
                                     ->withStringBody(json_encode(array(
                                         'status' => 'success',
-                                        'msg' => 'Cart Empty!',
+                                        'cart' => array(),
                                         'mode' => $this->mode)));
                             }
                         } else {
@@ -328,7 +328,7 @@ class CartController extends AppController
                                             ->withType('application/json')
                                             ->withStringBody(json_encode(array(
                                                 'status' => 'success',
-                                                'msg' => 'Cart Empty!',
+                                                'cart' => array(),
                                                 'mode' => $this->mode)));
                                     }
 

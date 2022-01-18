@@ -57,7 +57,7 @@ class CheckoutController extends AppController
 
                     $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
 
-                    if (!empty($getOrderSession)) {
+                    if (!empty($getOrderSession) && isset($getOrderSession)) {
                         return $this->getResponse()
                             ->withStatus(200)
                             ->withType('application/json')
@@ -71,7 +71,7 @@ class CheckoutController extends AppController
                             ->withType('application/json')
                             ->withStringBody(json_encode(array(
                                 'status' => 'success',
-                                'msg' => 'Cart Empty!',
+                                'order_session' => array(),
                                 'mode' => $this->mode)));
                     }
                 } else {
