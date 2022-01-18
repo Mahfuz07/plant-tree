@@ -45,11 +45,13 @@ class LocalDevicesController extends AppController
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
             'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory', 'getProduct', 'getAddress',
-            'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress'
+            'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress',
+            'getUserInfo', 'changePassword'
         ]);
         $actions =  array(
             'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory', 'getProduct', 'getAddress',
-            'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress'
+            'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress',
+            'getUserInfo', 'changePassword'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -1000,6 +1002,158 @@ class LocalDevicesController extends AppController
                                 'msg' => $errorMessage,
                                 'mode' => $this->mode)));
                     }
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Invalid request method',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getUserInfo() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                if (!empty($getUser)) {
+                    $fullUrl = Router::fullBaseUrl();
+                    if (!empty($getUser['image'])) {
+                        $getUser['image'] = $fullUrl . DS . $getUser['image'];
+                    }
+
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'user' => $getUser,
+                            'mode' => $this->mode)));
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'success',
+                            'user' => array(),
+                            'mode' => $this->mode)));
+
+                }
+
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function changePassword() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $current_password = isset($request_data['User']['current_password']) ? $request_data['User']['current_password'] : '';
+                    $new_password = isset($request_data['User']['new_password']) ? $request_data['User']['new_password'] : '';
+
+                    $errorMessage = [];
+                    if (empty($current_password)) {
+                        $errorMessage[] = ['Required field current password is missing'];
+                    }
+                    if (empty($new_password)) {
+                        $errorMessage[] = ['Required field new password is missing'];
+                    }
+
+                    if (count($errorMessage) == 0) {
+
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                        $users = $this->Users->find()->where(['id' => $getUser['id'], 'password' => Security::hash($current_password, null, true)])->first();
+
+                        if (!empty($users)) {
+                            $user['password'] = Security::hash($new_password, null, true);
+
+                            $users = $this->Users->patchEntity($users, $user);
+                            $users = $this->Users->save($users);
+
+                            if (!empty($users)) {
+                                $fullUrl = Router::fullBaseUrl();
+                                if (!empty($users['image'])) {
+                                    $users['image'] = $fullUrl . DS . $users['image'];
+                                }
+
+                                return $this->getResponse()
+                                    ->withStatus(200)
+                                    ->withType('application/json')
+                                    ->withStringBody(json_encode(array(
+                                        'status' => 'success',
+                                        'user' => $users,
+                                        'mode' => $this->mode)));
+                            }
+
+                        }
+                        else {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'user' => 'Current Password Not Match!',
+                                    'mode' => $this->mode)));
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => $errorMessage,
+                                'mode' => $this->mode)));
+                    }
+
                 } else {
                     return $this->getResponse()
                         ->withStatus(200)

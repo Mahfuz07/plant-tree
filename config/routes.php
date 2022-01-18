@@ -102,6 +102,8 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/users/refresh-token', ['controller' => 'LocalDevices', 'action' => 'getTokenByRefreshToken']);
         $routes->connect('/users/profile-image-change', ['controller' => 'LocalDevices', 'action' => 'profileImageChange']);
         $routes->connect('/users/update-user-info', ['controller' => 'LocalDevices', 'action' => 'updateProfileInfo']);
+        $routes->connect('/users/user-info', ['controller' => 'LocalDevices', 'action' => 'getUserInfo']);
+        $routes->connect('/users/change-password', ['controller' => 'LocalDevices', 'action' => 'changePassword']);
 
 
         $routes->connect('/address/save-address', ['controller' => 'LocalDevices', 'action' => 'saveAddress']);
