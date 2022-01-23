@@ -93,7 +93,7 @@ class OrderController extends AppController
                         ->withType('application/json')
                         ->withStringBody(json_encode(array(
                             'status' => 'error',
-                            'msg' => 'Invalid request method',
+                            'msg' => 'Missing data!',
                             'mode' => $this->mode)));
                 }
             } else {

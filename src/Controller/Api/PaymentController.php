@@ -55,86 +55,97 @@ class PaymentController extends AppController
 
             if ($this->request->is('post')) {
 
-                $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+                $request_data = $this->request->getQueryParams();
 
-                $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
+                if (!empty($request_data)) {
 
-                if (empty($getOrderSession)) {
-                    $sessionOrder = $this->json_decode($getOrderSession['session_order'], true);
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
 
-                    $uniqTranId = 'tree-' . uniqid();
-                    $post_data = array();
-                    $post_data['total_amount'] = number_format($sessionOrder['info']['total'], 2); # You cant not pay less than 10
-//                    $post_data['total_amount'] = "10"; # You cant not pay less than 10
-                    $post_data['currency'] = "BDT";
-                    $post_data['tran_id'] = $uniqTranId; // tran_id must be unique
+                    $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
 
-                    # CUSTOMER INFORMATION
-                    $post_data['cus_name'] = $getUser['display_name'] ?? '';
-                    $post_data['cus_email'] = $getUser['email'] ?? '';
-                    $post_data['cus_add1'] = $getUser['address'] ?? '';
-//                    $post_data['cus_name'] = 'test';
-//                    $post_data['cus_email'] = 'test@gmail.com';
-//                    $post_data['cus_add1'] = 'test';
-                    $post_data['cus_add2'] = "";
-                    $post_data['cus_city'] = "";
-                    $post_data['cus_state'] = "";
-                    $post_data['cus_postcode'] = "";
-                    $post_data['cus_country'] = "Bangladesh";
-                    $post_data['cus_phone'] = $getUser['phone_no'] ?? '';
-//                    $post_data['cus_phone'] = '01711111111';
-                    $post_data['cus_fax'] = "";
+                    if (empty($getOrderSession)) {
+                        $sessionOrder = $this->json_decode($getOrderSession['session_order'], true);
 
-                    # SHIPMENT INFORMATION
-                    $post_data['ship_name'] = $getUser['display_name'] ?? '';
-                    $post_data['ship_add1'] = $getUser['address'] ?? '';
-//                    $post_data['ship_name'] = '';
-//                    $post_data['ship_add1'] = '';
-//                $post_data['ship_add2'] = "Dhaka";
-                    $post_data['ship_city'] = "";
-//                $post_data['ship_state'] = "Dhaka";
-//                $post_data['ship_postcode'] = "1000";
-//                $post_data['ship_phone'] = "";
-//                $post_data['ship_country'] = "Bangladesh";
-                    $post_data['shipping_method'] = "NO";
-                    $post_data['product_name'] = "Trees";
-                    $post_data['product_category'] = "Goods";
-                    $post_data['product_profile'] = "physical-goods";
+                        $uniqTranId = 'tree-' . uniqid();
+                        $post_data = array();
+                        $post_data['total_amount'] = number_format($sessionOrder['info']['total'], 2); # You cant not pay less than 10
+    //                    $post_data['total_amount'] = "10"; # You cant not pay less than 10
+                        $post_data['currency'] = "BDT";
+                        $post_data['tran_id'] = $uniqTranId; // tran_id must be unique
 
-//                # OPTIONAL PARAMETERS
-//                $post_data['value_a'] = "ref001";
-//                $post_data['value_b'] = "ref002";
-//                $post_data['value_c'] = "ref003";
-//                $post_data['value_d'] = "ref004";
+                        # CUSTOMER INFORMATION
+                        $post_data['cus_name'] = $getUser['display_name'] ?? '';
+                        $post_data['cus_email'] = $getUser['email'] ?? '';
+                        $post_data['cus_add1'] = $getUser['address'] ?? '';
+    //                    $post_data['cus_name'] = 'test';
+    //                    $post_data['cus_email'] = 'test@gmail.com';
+    //                    $post_data['cus_add1'] = 'test';
+                        $post_data['cus_add2'] = "";
+                        $post_data['cus_city'] = "";
+                        $post_data['cus_state'] = "";
+                        $post_data['cus_postcode'] = "";
+                        $post_data['cus_country'] = "Bangladesh";
+                        $post_data['cus_phone'] = $getUser['phone_no'] ?? '';
+    //                    $post_data['cus_phone'] = '01711111111';
+                        $post_data['cus_fax'] = "";
 
-//                dd($post_data);
+                        # SHIPMENT INFORMATION
+                        $post_data['ship_name'] = $getUser['display_name'] ?? '';
+                        $post_data['ship_add1'] = $getUser['address'] ?? '';
+    //                    $post_data['ship_name'] = '';
+    //                    $post_data['ship_add1'] = '';
+    //                $post_data['ship_add2'] = "Dhaka";
+                        $post_data['ship_city'] = "";
+    //                $post_data['ship_state'] = "Dhaka";
+    //                $post_data['ship_postcode'] = "1000";
+    //                $post_data['ship_phone'] = "";
+    //                $post_data['ship_country'] = "Bangladesh";
+                        $post_data['shipping_method'] = "NO";
+                        $post_data['product_name'] = "Trees";
+                        $post_data['product_category'] = "Goods";
+                        $post_data['product_profile'] = "physical-goods";
 
-                    $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->newEmptyEntity();
-                    $orderSession['order_session_id'] = $getOrderSession['id'];
-                    $orderSession['tran_id'] = $uniqTranId;
-                    $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->patchEntity($sslCommerzOrderSessions, $orderSession);
-                    $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->save($sslCommerzOrderSessions);
+    //                # OPTIONAL PARAMETERS
+    //                $post_data['value_a'] = "ref001";
+    //                $post_data['value_b'] = "ref002";
+    //                $post_data['value_c'] = "ref003";
+    //                $post_data['value_d'] = "ref004";
 
-                    if (!empty($sslCommerzOrderSessions)) {
-                        $sslcz = new SslCommerzNotification();
-                        $response = $sslcz->makePayment($post_data, 'checkout', 'json'); // In your controller's action when saving failed
+    //                dd($post_data);
 
-                        $payment_options = (array)json_decode($response);
+                        $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->newEmptyEntity();
+                        $orderSession['order_session_id'] = $getOrderSession['id'];
+                        $orderSession['tran_id'] = $uniqTranId;
+                        $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->patchEntity($sslCommerzOrderSessions, $orderSession);
+                        $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->save($sslCommerzOrderSessions);
 
-                        echo "<meta http-equiv='refresh' content='0;url=".$payment_options['data']."'>";
-                        exit();
-                    } else {
-                        return $this->getResponse()
-                            ->withStatus(200)
-                            ->withType('application/json')
-                            ->withStringBody(json_encode(array(
-                                'status' => 'error',
-                                'msg' => 'session data not saved',
-                                'mode' => $this->mode)));
+                        if (!empty($sslCommerzOrderSessions)) {
+                            $sslcz = new SslCommerzNotification();
+                            $response = $sslcz->makePayment($post_data, 'checkout', 'json'); // In your controller's action when saving failed
+
+                            $payment_options = (array)json_decode($response);
+
+                            echo "<meta http-equiv='refresh' content='0;url=".$payment_options['data']."'>";
+                            exit();
+                        } else {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'error',
+                                    'msg' => 'session data not saved',
+                                    'mode' => $this->mode)));
+                        }
+
                     }
-
                 } else {
-
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing data!',
+                            'mode' => $this->mode)));
                 }
 
             } else {
