@@ -165,6 +165,8 @@ Mailer::setConfig(Configure::consume('Email'));
 Log::setConfig(Configure::consume('Log'));
 Security::setSalt(Configure::consume('Security.salt'));
 
+Configure::write('LOCAL_HOST', 'LIVE');
+
 /*
  * Setup detectors for mobile and tablet.
  * If you don't use these checks you can safely remove this code

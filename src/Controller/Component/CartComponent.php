@@ -19,7 +19,7 @@ class CartComponent extends BaseComponent
 
 //        $this->Users = $this->getDbTable('ManageUser.Users');
 //        $this->Roles =  $this->getDbTable('ManageUser.Roles');
-//        $this->Categories = $this->getDbTable('Categories');
+        $this->Categories = $this->getDbTable('Categories');
         $this->Products = TableRegistry::getTableLocator()->get('Products');
         $this->ProductDeliveryAddress = TableRegistry::getTableLocator()->get('ProductDeliveryAddress');
         $this->ProductImages = $this->getDbTable('ProductImages');
@@ -30,6 +30,8 @@ class CartComponent extends BaseComponent
         $product_id = $data['Product']['product_id'];
 
         $productData = $this->Products->find()->where(['id' => $product_id])->first();
+
+        $categories = $this->Categories->find()->where(['id' => $productData['category_id']])->first();
 
         $productInfo = [];
         if (!empty($productData)) {
@@ -54,6 +56,8 @@ class CartComponent extends BaseComponent
 
         $productInfo['id'] = $productData['id'];
         $productInfo['quantity'] = $quantity;
+        $productInfo['category_id'] = $productData['category_id'];
+        $productInfo['category_name'] = $categories['title'];
         $productInfo['name'] = $productData['title'];
         $productInfo['slug'] = $productData['slug'];
         $productInfo['price'] = intval($productData['price']);
