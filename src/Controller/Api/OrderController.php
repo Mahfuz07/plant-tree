@@ -4,6 +4,8 @@ namespace App\Controller\Api;
 
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
+use Cake\Routing\Router;
+use Cake\Utility\Security;
 use ManageUser\Controller\AppController;
 
 class OrderController extends AppController
@@ -44,12 +46,75 @@ class OrderController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'index', 'processOrder'
+            'index', 'processOrder', 'orderHistory'
         ]);
         $actions =  array(
-            'index', 'processOrder'
+            'index', 'processOrder', 'orderHistory'
         );
         $this->Security->setConfig('unlockedActions', $actions);
+    }
+
+    public function orderHistory() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = $this->request->getQueryParams();
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id']:'';
+
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    $getOrders = $this->Orders->find()->select(['id','user_id', 'date_purchased', 'order_total'])->where(['user_id' => $getUser['id']])->toArray();
+
+                    if (!empty($getOrders)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'orders' => $getOrders,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'orders' => array(),
+                                'mode' => $this->mode)));
+                    }
+
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Invalid request method',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
     }
 
     public function processOrder($tran_id, $requestData) {

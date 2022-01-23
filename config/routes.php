@@ -126,6 +126,8 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/payment/fail', ['controller' => 'Payment', 'action' => 'fail']);
         $routes->connect('/payment/cancel', ['controller' => 'Payment', 'action' => 'cancel']);
 
+        $routes->connect('/order/order-history', ['controller' => 'Order', 'action' => 'orderHistory']);
+
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);
 //    $routes->connect('/users/users/api_forgot_password', ['controller' => 'LocalDevices', 'action' => 'apiForgotPassword']);
