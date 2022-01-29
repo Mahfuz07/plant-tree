@@ -46,10 +46,10 @@ class OrderController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'index', 'processOrder', 'orderHistory'
+            'index', 'processOrder', 'orderHistory', 'getOrder'
         ]);
         $actions =  array(
-            'index', 'processOrder', 'orderHistory'
+            'index', 'processOrder', 'orderHistory', 'getOrder'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -67,7 +67,7 @@ class OrderController extends AppController
 
                     $getUser = $this->getComponent('CommonFunction')->getUserInfo();
 
-                    $getOrders = $this->Orders->find()->select(['id','user_id', 'date_purchased', 'order_total'])->where(['user_id' => $getUser['id']])->toArray();
+                    $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage','user_id', 'date_purchased', 'order_total'])->where(['user_id' => $getUser['id']])->toArray();
 
                     if (!empty($getOrders)) {
                         return $this->getResponse()
@@ -84,6 +84,70 @@ class OrderController extends AppController
                             ->withStringBody(json_encode(array(
                                 'status' => 'error',
                                 'orders' => array(),
+                                'mode' => $this->mode)));
+                    }
+
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing data!',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function getOrder() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = $this->request->getQueryParams();
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['user_id']) ? $request_data['user_id']:'';
+                    $order_id = isset($request_data['order_id']) ? $request_data['order_id']:'';
+
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage','user_id', 'date_purchased', 'order_sub_total', 'order_total'])->where(['user_id' => $getUser['id'], 'order_id' => $order_id])->first();
+
+                    if (!empty($getOrders)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'order' => $getOrders,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'order' => array(),
                                 'mode' => $this->mode)));
                     }
 
@@ -181,6 +245,7 @@ class OrderController extends AppController
         if (!empty($orders)) {
 
             $parseData['user_id'] = $orders['user_info']['id'];
+            $parseData['order_id'] = substr(uniqid(),0,8);
             $parseData['date_purchased'] = $orders['info']['date_purchased'];
             $parseData['order_status'] = 'Success';
             $parseData['order_stage'] = 'Processing';

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utility\SSLCommerz;
+namespace App\Utility\sslcommerz;
 
 interface SslCommerzInterface
 {

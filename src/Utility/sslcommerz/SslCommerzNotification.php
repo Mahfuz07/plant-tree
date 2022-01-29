@@ -1,5 +1,5 @@
 <?php
-namespace App\Utility\SSLCommerz;
+namespace App\Utility\sslcommerz;
 
 use Cake\Core\Configure;
 use Cake\Routing\Router;
@@ -73,7 +73,7 @@ class SslCommerzNotification extends AbstractSslCommerz
                      curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
                      curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, false);
                  } else {
-                     curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, true);
+                     curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, false);
                      curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
                  }
 

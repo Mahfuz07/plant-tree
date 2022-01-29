@@ -46,12 +46,12 @@ class LocalDevicesController extends AppController
         $this->Auth->allow([
             'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getAllProductsByCategory', 'getProduct', 'getAddress',
             'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress',
-            'getUserInfo', 'changePassword'
+            'getUserInfo', 'changePassword', 'filterProducts'
         ]);
         $actions =  array(
             'login', 'getTokenByRefreshToken', 'logout', 'createUser', 'getProduct', 'getAllProductsByCategory', 'getProduct', 'getAddress',
             'addToFavouriteProduct', 'getFavouriteProducts', 'getRecentlyView', 'profileImageChange', 'updateProfileInfo', 'saveAddress',
-            'getUserInfo', 'changePassword'
+            'getUserInfo', 'changePassword', 'filterProducts'
         );
         $this->Security->setConfig('unlockedActions', $actions);
     }
@@ -339,6 +339,125 @@ class LocalDevicesController extends AppController
                             'status' => 'success',
                             'products' => array(),
                             'mode' => $this->mode)));
+                }
+
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function filterProducts(): Response {
+
+        if ($this->AccessToken->verify()) {
+            if ($this->request->is('post')) {
+                $request_data = $this->request->getQueryParams();
+
+                if (!empty($request_data)) {
+                    $action = isset($request_data['action']) ? $request_data['action']:'';
+                    $minPrice = isset($request_data['min_price']) ? $request_data['min_price']:'';
+                    $maxPrice = isset($request_data['max_price']) ? $request_data['max_price']:'';
+
+                    if (!empty($action) && $action == 'lowToHigh') {
+                        if (!empty($minPrice) && !empty($maxPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                        } elseif (!empty($minPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderAsc('price')->toArray();
+                        } elseif (!empty($maxPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                        }else {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderAsc('price')->toArray();
+                        }
+                    } elseif (!empty($action) && $action == 'highToLow') {
+                        if (!empty($minPrice) && !empty($maxPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderDesc('price')->toArray();
+                        } elseif (!empty($minPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderDesc('price')->toArray();
+                        } elseif (!empty($maxPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderDesc('price')->toArray();
+                        } else {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderDesc('price')->toArray();
+                        }
+                    } elseif (!empty($action) && $action == 'bestMatch') {
+
+                        if (!empty($minPrice) && !empty($maxPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                        } elseif (!empty($minPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderAsc('price')->toArray();
+                        } elseif (!empty($maxPrice)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                        }else {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderAsc('price')->toArray();
+                        }
+                    }
+
+                    $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                    if (!empty($products)) {
+
+                        foreach ($products as $product) {
+
+                            $getFavoriteProduct = $this->FavouritesProduct->find()->where(['product_id' => $product['id'], 'user_id' => $getUser['id']])->first();
+
+                            if (!empty($getFavoriteProduct)) {
+                                $product['favorite'] = true;
+                            } else {
+                                $product['favorite'] = false;
+                            }
+
+                            $images = $this->ProductImages->find()->where(['product_id' => $product['id']])->toArray();
+                            if (!empty($images)) {
+                                $imageArray = [];
+                                $fullUrl = Router::fullBaseUrl();
+                                foreach ($images as $image) {
+                                    $imageArray[] = $fullUrl . '/' . $image['image_path'];
+                                }
+                                $product['image'] = $imageArray;
+                            }
+                        }
+                    }
+
+                    if (!empty($products)) {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'products' => $products,
+                                'mode' => $this->mode)));
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'success',
+                                'products' => array(),
+                                'mode' => $this->mode)));
+                    }
+
+                } else {
+                        return $this->getResponse()
+                            ->withStatus(200)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => 'Invalid request method',
+                                'mode' => $this->mode)));
                 }
 
             } else {

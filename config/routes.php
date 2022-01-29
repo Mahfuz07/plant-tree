@@ -114,6 +114,7 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/products/addToFavouriteProduct', ['controller' => 'LocalDevices', 'action' => 'addToFavouriteProduct']);
         $routes->connect('/products/getFavouriteProducts', ['controller' => 'LocalDevices', 'action' => 'getFavouriteProducts']);
         $routes->connect('/products/getRecentlyView', ['controller' => 'LocalDevices', 'action' => 'getRecentlyView']);
+        $routes->connect('/products/filter-products', ['controller' => 'LocalDevices', 'action' => 'filterProducts']);
 
 
         $routes->connect('/checkout', ['controller' => 'Checkout', 'action' => 'index']);
@@ -127,6 +128,7 @@ return static function (RouteBuilder $routes) {
         $routes->connect('/payment/cancel', ['controller' => 'Payment', 'action' => 'cancel']);
 
         $routes->connect('/order/order-history', ['controller' => 'Order', 'action' => 'orderHistory']);
+        $routes->connect('/order/get-order', ['controller' => 'Order', 'action' => 'getOrder']);
 
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);

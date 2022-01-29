@@ -2,7 +2,7 @@
 
 namespace App\Controller\Api;
 
-use App\Utility\SSLCommerz\SslCommerzNotification;
+use App\Utility\sslcommerz\SslCommerzNotification;
 use Cake\Event\EventInterface;
 use App\Controller\AppController;
 
