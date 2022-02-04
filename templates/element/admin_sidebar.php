@@ -68,6 +68,25 @@
                     <!--                        <li><a href="layout-fixed-sidebar.html">Fixed Sidebar</a></li>-->
                 </ul>
             </li>
+            <li class="mega-menu mega-menu-sm">
+                <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                    <i class="fa fa-users menu-icon"></i><span class="nav-text">News</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a href="./layout-blank.html">News</a></li>
+                    <li><a href="/admin/news/add">Add News</a></li>
+                    <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
+                    <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->
+                    <!--                        <li><a href="./layout-vertical.html">Vertical</a></li>-->
+                    <!--                        <li><a href="./layout-horizontal.html">Horizontal</a></li>-->
+                    <!--                        <li><a href="./layout-boxed.html">Boxed</a></li>-->
+                    <!--                        <li><a href="./layout-wide.html">Wide</a></li>-->
+                    <!---->
+                    <!---->
+                    <!--                        <li><a href="./layout-fixed-header.html">Fixed Header</a></li>-->
+                    <!--                        <li><a href="layout-fixed-sidebar.html">Fixed Sidebar</a></li>-->
+                </ul>
+            </li>
             <!--                <li class="nav-label">Apps</li>-->
             <!--                <li>-->
             <!--                    <a class="has-arrow" href="javascript:void()" aria-expanded="false">-->

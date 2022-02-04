@@ -372,36 +372,93 @@ class LocalDevicesController extends AppController
                     $action = isset($request_data['action']) ? $request_data['action']:'';
                     $minPrice = isset($request_data['min_price']) ? $request_data['min_price']:'';
                     $maxPrice = isset($request_data['max_price']) ? $request_data['max_price']:'';
+                    $search_product = isset($request_data['search_product']) ? $request_data['search_product']:'';
 
                     if (!empty($action) && $action == 'lowToHigh') {
                         if (!empty($minPrice) && !empty($maxPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            }
                         } elseif (!empty($minPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderAsc('price')->toArray();
+                            }
                         } elseif (!empty($maxPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            }
                         }else {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1,'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderAsc('price')->toArray();
+                            }
                         }
                     } elseif (!empty($action) && $action == 'highToLow') {
                         if (!empty($minPrice) && !empty($maxPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderDesc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice, 'display_name LIKE' => $search_product . '%'])->orderDesc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderDesc('price')->toArray();
+                            }
                         } elseif (!empty($minPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderDesc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'display_name LIKE' => $search_product . '%'])->orderDesc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderDesc('price')->toArray();
+                            }
                         } elseif (!empty($maxPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderDesc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice, 'display_name LIKE' => $search_product . '%'])->orderDesc('price')->toArray();
+
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderDesc('price')->toArray();
+                            }
                         } else {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderDesc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'display_name LIKE' => $search_product . '%'])->orderDesc('price')->toArray();
+
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderDesc('price')->toArray();
+                            }
                         }
                     } elseif (!empty($action) && $action == 'bestMatch') {
 
                         if (!empty($minPrice) && !empty($maxPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            }
                         } elseif (!empty($minPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price >=' => $minPrice])->orderAsc('price')->toArray();
+                            }
                         } elseif (!empty($maxPrice)) {
-                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'price <=' => $maxPrice])->orderAsc('price')->toArray();
+                            }
                         }else {
+                            if (!empty($search_product)) {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                            } else {
+                                $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderAsc('price')->toArray();
+                            }
+                        }
+                    } else {
+                        if (!empty($search_product)) {
+                            $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1, 'display_name LIKE' => $search_product . '%'])->orderAsc('price')->toArray();
+                        } else {
                             $products = $this->Products->find()->where(['category_id in (SELECT id FROM categories WHERE published = 1)', 'published' => 1])->orderAsc('price')->toArray();
                         }
                     }
@@ -891,9 +948,11 @@ class LocalDevicesController extends AppController
 
                 $request_data = $this->request->getData();
                 $this->log($request_data);
+                $this->log('Upload Image:');
+                $this->log($this->request->getUploadedFile('image'));
 
                 if (!empty($request_data)) {
-                    $image = isset($request_data['image']) ? $request_data['image'] : '';
+                    $image = $this->request->getUploadedFile('image');
                     $user_id = isset($request_data['user_id']) ? $request_data['user_id'] : '';
 
                     $errorMessage = [];
@@ -910,19 +969,22 @@ class LocalDevicesController extends AppController
                         $users = $this->Users->find()->where(['id' => $getUser['id']])->first();
 
                         if (!empty($users['image'])) {
-                            unlink(WWW_ROOT . $users['image']);
+                            if (is_file(WWW_ROOT . $users['image'])) {
+                                unlink(WWW_ROOT . $users['image']);
+                            }
+
                         }
                         $extension=array("jpeg","jpg","png");
                         $file_name= $image->getClientFilename();
                         $ext = pathinfo($file_name,PATHINFO_EXTENSION);
 
                         $image_name = $users['id'] . '-main-image-' . strtotime(date('Y-m-d H:i:s'));
-                        $targetPath = WWW_ROOT . 'img' . DS . 'profile_images' . DS . $image_name . '.' . $ext;
+                        $targetPath = WWW_ROOT . 'img' . DS . 'profile_images' . DS . $image_name . '.' . strtolower($ext);
 
-                        if(in_array($ext,$extension)) {
+                        if(in_array(strtolower($ext),$extension)) {
                             if(!file_exists($targetPath)) {
                                 $image->moveTo($targetPath);
-                                $saveImage['image'] = 'img' . DS . 'profile_images' . DS . $image_name . '.' . $ext;
+                                $saveImage['image'] = 'img' . DS . 'profile_images' . DS . $image_name . '.' . strtolower($ext);
                                 $users = $this->Users->patchEntity($users, $saveImage);
                                 $getUserInfo = $this->Users->save($users);
                                 if ($getUserInfo->id) {

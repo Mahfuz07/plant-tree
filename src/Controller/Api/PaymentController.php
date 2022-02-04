@@ -63,7 +63,7 @@ class PaymentController extends AppController
 
                     $getOrderSession = $this->OrderSessions->find()->where(['user_id' => $getUser['id'], 'order_status' => 0])->first();
 
-                    if (empty($getOrderSession)) {
+                    if (!empty($getOrderSession)) {
                         $sessionOrder = $this->json_decode($getOrderSession['session_order'], true);
 
                         $uniqTranId = 'tree-' . uniqid();
@@ -125,7 +125,7 @@ class PaymentController extends AppController
 
                             $payment_options = (array)json_decode($response);
 
-                            echo "<meta http-equiv='refresh' content='0;url=".$payment_options['data']."'>";
+                            echo $payment_options['data'];
                             exit();
                         } else {
                             return $this->getResponse()

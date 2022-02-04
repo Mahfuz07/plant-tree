@@ -52,44 +52,54 @@ return static function (RouteBuilder $routes) {
 
     $routes->prefix('admin', function ($routes) {
 
-            $routes->connect('/', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'login']);
+        $routes->connect('/', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'login']);
 
-            $routes->connect('/login', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'login']);
+        $routes->connect('/login', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'login']);
 
-            $routes->connect('/dashboard', ['plugin' => 'ManageUser', 'controller' => 'Users',  'action' => 'dashboard']);
+        $routes->connect('/dashboard', ['plugin' => 'ManageUser', 'controller' => 'Users',  'action' => 'dashboard']);
 
-            $routes->connect('/customers/add', ['controller' => 'Customers',  'action' => 'add']);
+//      Customer Sections
+        $routes->connect('/customers/add', ['controller' => 'Customers',  'action' => 'add']);
 
-            $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
+        $routes->connect('/customers/check-email', ['controller' => 'Customers',  'action' => 'checkEmail']);
 
-            $routes->connect('/products/edit/*', ['controller' => 'Products',  'action' => 'edit']);
+        //News Sections
+        $routes->connect('/news/add', ['controller' => 'News',  'action' => 'add']);
 
-            $routes->connect('/products', ['controller' => 'Products',  'action' => 'index']);
+//      Product Sections
+        $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
 
-            $routes->connect('/categories/add', ['controller' => 'Categories',  'action' => 'add']);
+        $routes->connect('/products/edit/*', ['controller' => 'Products',  'action' => 'edit']);
 
-            $routes->connect('/categories/edit/*', ['controller' => 'Categories',  'action' => 'edit']);
+        $routes->connect('/products', ['controller' => 'Products',  'action' => 'index']);
 
-            $routes->connect('/categories', ['controller' => 'Categories',  'action' => 'index']);
+//      Categories Sections
 
-            $routes->connect('/customers/check-email', ['controller' => 'Customers',  'action' => 'checkEmail']);
+        $routes->connect('/categories/add', ['controller' => 'Categories',  'action' => 'add']);
 
-            $routes->connect('/logout', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'logout']);
+        $routes->connect('/categories/edit/*', ['controller' => 'Categories',  'action' => 'edit']);
 
-            $routes->connect('/forgot-password', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'forgotPassword']);
+        $routes->connect('/categories', ['controller' => 'Categories',  'action' => 'index']);
 
-            $routes->connect('/users', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'index']);
 
-            $routes->connect('/users/edit/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'edit']);
+        $routes->connect('/logout', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'logout']);
 
-            $routes->connect('/users/delete/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'delete']);
+        $routes->connect('/forgot-password', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'forgotPassword']);
 
-            $routes->connect('/users/change-state/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'changeState']);
+        // User Sections
 
-            $routes->connect('/users/check-email/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'checkEmail']);
+        $routes->connect('/users', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'index']);
 
-            $routes->fallbacks('DashedRoute');
-        });
+        $routes->connect('/users/edit/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'edit']);
+
+        $routes->connect('/users/delete/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'delete']);
+
+        $routes->connect('/users/change-state/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'changeState']);
+
+        $routes->connect('/users/check-email/*', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'checkEmail']);
+
+        $routes->fallbacks('DashedRoute');
+    });
 
 
     $routes->prefix('api', function ($routes) {
@@ -129,6 +139,9 @@ return static function (RouteBuilder $routes) {
 
         $routes->connect('/order/order-history', ['controller' => 'Order', 'action' => 'orderHistory']);
         $routes->connect('/order/get-order', ['controller' => 'Order', 'action' => 'getOrder']);
+
+
+        $routes->connect('/news/news-list', ['controller' => 'News', 'action' => 'newsList']);
 
 //    $routes->connect('/users/users/api_user_role_login', ['controller' => 'LocalDevices', 'action' => 'loginRole']);
 //    $routes->connect('/users/users/add_user', ['controller' => 'LocalDevices', 'action' => 'addUser']);
