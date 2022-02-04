@@ -72,7 +72,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="form-validation">
-                                <?php echo $this->Form->create(null, array('enctype'=>'multipart/form-data')); ?>
+                                <?php echo $this->Form->create($news, array('enctype'=>'multipart/form-data')); ?>
                                 <div class="form-valide" action="#" method="post">
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-Image">Image<span class="text-danger">*</span>
@@ -122,7 +122,7 @@
                                         </label>
                                         <div class="col-lg-6">
                                             <?php
-                                            echo $this->Form->input('content_text', array(
+                                            echo $this->Form->input('content', array(
                                                 'type' =>'textarea',
                                                 'class' =>'click2edit summernote m-b-40',
                                                 'id' =>'content',

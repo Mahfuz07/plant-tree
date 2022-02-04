@@ -49,6 +49,7 @@ return static function (RouteBuilder $routes) {
 //    });
 
     $routes->connect('/', ['plugin' => 'ManageUser', 'controller' => 'Users', 'action' => 'login']);
+    $routes->connect('/news/view/*', ['controller' => 'News', 'action' => 'view']);
 
     $routes->prefix('admin', function ($routes) {
 
@@ -65,6 +66,10 @@ return static function (RouteBuilder $routes) {
 
         //News Sections
         $routes->connect('/news/add', ['controller' => 'News',  'action' => 'add']);
+
+        $routes->connect('/news/edit/*', ['controller' => 'News',  'action' => 'edit']);
+
+        $routes->connect('/news/delete/*', ['controller' => 'News',  'action' => 'delete']);
 
 //      Product Sections
         $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
