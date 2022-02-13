@@ -10,6 +10,7 @@ use Cake\Utility\Security;
 use ManageUser\Controller\AppController;
 use phpDocumentor\Reflection\Types\This;
 use Cake\Http\Response;
+use Symfony\Component\HttpFoundation\File\File;
 
 class LocalDevicesController extends AppController
 {
@@ -945,6 +946,10 @@ class LocalDevicesController extends AppController
         if ($this->AccessToken->verify()) {
 
             if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
 
                 $request_data = $this->request->getData();
                 $this->log($request_data);

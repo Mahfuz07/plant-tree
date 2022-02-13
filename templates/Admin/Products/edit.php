@@ -73,26 +73,6 @@
                                 <?php echo $this->Form->create($product , ['id' => 'user-password-form']); ?>
                                 <div class="form-valide" action="#" method="post">
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-Image">
-                                        </label>
-                                        <div class="col-lg-6">
-                                            <div id="uploaded_image" >
-                                                <img src="<?= $product['image'] ;?>" alt="Girl in a jacket" width="200" height="200"/>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label" for="val-Image">Image
-<!--                                            <span class="text-danger">*</span>-->
-                                        </label>
-                                        <div class="col-lg-6">
-                                            <div class="panel panel-default">
-                                                <input type="file" name="upload_image" id="upload_image" data-toggle="modal" data-target="#basicModal"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-category">Category<span class="text-danger">*</span>
                                         </label>
                                         <div class="col-lg-6">
@@ -234,26 +214,3 @@
 </body>
 
 </html>
-<!--id="uploadimageModal"-->
-<div class="modal fade" id="basicModal">
-    <div class="modal-dialog">
-        <div class="modal-content" style="width: 700px">
-            <div class="modal-header">
-                <h5 class="modal-title">Crop & Upload Image</h5>
-                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <div id="image_demo" style="margin-top:30px"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary crop_image" data-dismiss="modal">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>

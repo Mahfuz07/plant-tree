@@ -78,6 +78,10 @@ return static function (RouteBuilder $routes) {
 
         $routes->connect('/products', ['controller' => 'Products',  'action' => 'index']);
 
+        $routes->connect('/products/upload-image/*', ['controller' => 'Products',  'action' => 'uploadImage']);
+
+        $routes->connect('/products/image-delete/*', ['controller' => 'Products',  'action' => 'imageDelete']);
+
 //      Categories Sections
 
         $routes->connect('/categories/add', ['controller' => 'Categories',  'action' => 'add']);
@@ -144,6 +148,8 @@ return static function (RouteBuilder $routes) {
 
         $routes->connect('/order/order-history', ['controller' => 'Order', 'action' => 'orderHistory']);
         $routes->connect('/order/get-order', ['controller' => 'Order', 'action' => 'getOrder']);
+        $routes->connect('/order/cancel-order', ['controller' => 'Order', 'action' => 'orderCancel']);
+        $routes->connect('/order/save-order-note', ['controller' => 'Order', 'action' => 'saveOrderNote']);
 
 
         $routes->connect('/news/news-list', ['controller' => 'News', 'action' => 'newsList']);

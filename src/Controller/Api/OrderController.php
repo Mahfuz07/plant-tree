@@ -46,12 +46,198 @@ class OrderController extends AppController
         //$this->getEventManager()->off($this->Csrf);
         $this->Session= $this->getRequest()->getSession();
         $this->Auth->allow([
-            'index', 'processOrder', 'orderHistory', 'getOrder'
+            'index', 'processOrder', 'orderHistory', 'getOrder', 'orderCancel', 'saveOrderNote'
         ]);
         $actions =  array(
-            'index', 'processOrder', 'orderHistory', 'getOrder'
+            'index', 'processOrder', 'orderHistory', 'getOrder', 'orderCancel', 'saveOrderNote'
         );
         $this->Security->setConfig('unlockedActions', $actions);
+    }
+
+    public function saveOrderNote() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['Order']['user_id']) ? $request_data['Order']['user_id']:'';
+                    $order_note = isset($request_data['Order']['order_note']) ? $request_data['Order']['order_note']:'';
+                    $order_id = isset($request_data['Order']['order_id']) ? $request_data['Order']['order_id']:'';
+
+                    $errorMessage = [];
+                    if (empty($user_id)) {
+                        $errorMessage[] = ['Required field user id is missing'];
+                    }
+                    if (empty($order_note)) {
+                        $errorMessage[] = ['Required field order note is missing'];
+                    }
+                    if (empty($order_id)) {
+                        $errorMessage[] = ['Required field order id is missing'];
+                    }
+
+                    if (count($errorMessage) == 0) {
+
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                        $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage', 'user_id', 'date_purchased', 'order_sub_total', 'order_total', 'order_note'])->where(['user_id' => $getUser['id'], 'order_id' => $order_id])->first();
+
+                        $orderStatus['order_note'] = $order_note;
+                        $getOrders = $this->Orders->patchEntity($getOrders,$orderStatus);
+                        $getOrders = $this->Orders->save($getOrders);
+
+                        if (!empty($getOrders)) {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'order' => $getOrders,
+                                    'mode' => $this->mode)));
+                        } else {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'error',
+                                    'order' => array(),
+                                    'mode' => $this->mode)));
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => $errorMessage,
+                                'mode' => $this->mode)));
+                    }
+
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing data!',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
+    }
+
+    public function orderCancel() {
+
+        if ($this->AccessToken->verify()) {
+
+            if ($this->request->is('post')) {
+
+                $request_data = file_get_contents("php://input");
+                $request_data = $this->json_decode($request_data, true);
+                $this->log($request_data);
+
+                if (!empty($request_data)) {
+                    $user_id = isset($request_data['Order']['user_id']) ? $request_data['Order']['user_id']:'';
+//                    $order_status = isset($request_data['Order']['order_status']) ? $request_data['Order']['order_status']:'';
+                    $order_id = isset($request_data['Order']['order_id']) ? $request_data['Order']['order_id']:'';
+
+                    $errorMessage = [];
+                    if (empty($user_id)) {
+                        $errorMessage[] = ['Required field user id is missing'];
+                    }
+//                    if (empty($order_status)) {
+//                        $errorMessage[] = ['Required field order status is missing'];
+//                    }
+                    if (empty($order_id)) {
+                        $errorMessage[] = ['Required field order id is missing'];
+                    }
+
+                    if (count($errorMessage) == 0) {
+
+                        $getUser = $this->getComponent('CommonFunction')->getUserInfo();
+
+                        $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage', 'user_id', 'date_purchased', 'order_sub_total', 'order_total', 'order_note'])->where(['user_id' => $getUser['id'], 'order_id' => $order_id])->first();
+
+                        $orderStatus['order_stage'] = 'Cancel';
+                        $getOrders = $this->Orders->patchEntity($getOrders,$orderStatus);
+                        $getOrders = $this->Orders->save($getOrders);
+
+                        if (!empty($getOrders)) {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'success',
+                                    'order' => $getOrders,
+                                    'mode' => $this->mode)));
+                        } else {
+                            return $this->getResponse()
+                                ->withStatus(200)
+                                ->withType('application/json')
+                                ->withStringBody(json_encode(array(
+                                    'status' => 'error',
+                                    'order' => array(),
+                                    'mode' => $this->mode)));
+                        }
+                    } else {
+                        return $this->getResponse()
+                            ->withStatus(404)
+                            ->withType('application/json')
+                            ->withStringBody(json_encode(array(
+                                'status' => 'error',
+                                'msg' => $errorMessage,
+                                'mode' => $this->mode)));
+                    }
+
+                } else {
+                    return $this->getResponse()
+                        ->withStatus(200)
+                        ->withType('application/json')
+                        ->withStringBody(json_encode(array(
+                            'status' => 'error',
+                            'msg' => 'Missing data!',
+                            'mode' => $this->mode)));
+                }
+            } else {
+                return $this->getResponse()
+                    ->withStatus(200)
+                    ->withType('application/json')
+                    ->withStringBody(json_encode(array(
+                        'status' => 'error',
+                        'msg' => 'Invalid request method',
+                        'mode' => $this->mode)));
+            }
+        } else {
+            header('HTTP/1.1 401 Unauthorized', true, 401);
+            return $this->getResponse()
+                ->withStatus(401)
+                ->withType('application/json')
+                ->withStringBody(json_encode(array(
+                    'status' => 'error',
+                    'msg' => 'Invalid access token.',
+                    'mode' => $this->mode)));
+        }
     }
 
     public function orderHistory() {
@@ -67,7 +253,7 @@ class OrderController extends AppController
 
                     $getUser = $this->getComponent('CommonFunction')->getUserInfo();
 
-                    $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage','user_id', 'date_purchased', 'order_total'])->where(['user_id' => $getUser['id']])->toArray();
+                    $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage','user_id', 'date_purchased', 'order_total', 'order_note'])->where(['user_id' => $getUser['id']])->toArray();
 
                     if (!empty($getOrders)) {
                         return $this->getResponse()
@@ -131,7 +317,7 @@ class OrderController extends AppController
 
                     $getUser = $this->getComponent('CommonFunction')->getUserInfo();
 
-                    $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage','user_id', 'date_purchased', 'order_sub_total', 'order_total'])->where(['user_id' => $getUser['id'], 'order_id' => $order_id])->first();
+                    $getOrders = $this->Orders->find()->select(['id', 'order_id', 'order_stage','user_id', 'date_purchased', 'order_sub_total', 'order_total', 'order_note'])->where(['user_id' => $getUser['id'], 'order_id' => $order_id])->first();
 
                     if (!empty($getOrders)) {
                         return $this->getResponse()

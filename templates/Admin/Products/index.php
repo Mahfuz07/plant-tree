@@ -1,3 +1,9 @@
+<?php
+
+use Cake\Routing\Router;
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -68,6 +74,21 @@
         </div>
 
         <div class="container-fluid">
+            <?php
+            $success = $this->Flash->render('success');
+            $error = $this->Flash->render('error');
+            if ($success) { ?>
+                <div class="alert alert-success">
+                    <?php echo $success; ?>
+                </div>
+            <?php }
+
+            if ($error) { ?>
+                <div class="alert alert-danger">
+                    <?php echo $error; ?>
+                </div>
+            <?php } ?>
+
             <div class="row">
                 <div class="col-12">
                     <div class="card">
@@ -99,7 +120,10 @@
                                             <td><?= $product['id'] ?></td>
                                             <td><?= $product['title'] ?></td>
                                             <td><?= $product['display_name'] ?></td>
-                                            <td ><img src="<?= $product['image'] ;?>" alt="Girl in a jacket" width="60" height="60"/></td>
+                                            <td>
+                                                <img src="<?= Router::fullBaseUrl() . '/' . $product['image'] ;?>" alt="Product Image" width="90" height="60"/><br><br>
+                                                <?= $this->Html->link('Upload Image',['controller' => 'Products' , 'action' => 'uploadImage', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?>
+                                            </td>
                                             <td><?= $product['description'] ?></td>
                                             <td><?= $product['price'] ?></td>
                                             <td><?= $product['published'] ?></td>
@@ -108,74 +132,8 @@
                                                 <?= $this->Html->link('Delete',['controller' => 'Products' , 'action' => 'edit', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?></td>
                                         </tr>
                                     <?php } ?>
-<!--                                    <tr>-->
-<!--                                        <td>Garrett Winters</td>-->
-<!--                                        <td>Accountant</td>-->
-<!--                                        <td>Tokyo</td>-->
-<!--                                        <td>63</td>-->
-<!--                                        <td>2011/07/25</td>-->
-<!--                                        <td>$170,750</td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Ashton Cox</td>-->
-<!--                                        <td>Junior Technical Author</td>-->
-<!--                                        <td>San Francisco</td>-->
-<!--                                        <td>66</td>-->
-<!--                                        <td>2009/01/12</td>-->
-<!--                                        <td>$86,000</td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Cedric Kelly</td>-->
-<!--                                        <td>Senior Javascript Developer</td>-->
-<!--                                        <td>Edinburgh</td>-->
-<!--                                        <td>22</td>-->
-<!--                                        <td>2012/03/29</td>-->
-<!--                                        <td>$433,060</td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Airi Satou</td>-->
-<!--                                        <td>Accountant</td>-->
-<!--                                        <td>Tokyo</td>-->
-<!--                                        <td>33</td>-->
-<!--                                        <td>2008/11/28</td>-->
-<!--                                        <td>$162,700</td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Brielle Williamson</td>-->
-<!--                                        <td>Integration Specialist</td>-->
-<!--                                        <td>New York</td>-->
-<!--                                        <td>61</td>-->
-<!--                                        <td>2012/12/02</td>-->
-<!--                                        <td>$372,000</td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Herrod Chandler</td>-->
-<!--                                        <td>Sales Assistant</td>-->
-<!--                                        <td>San Francisco</td>-->
-<!--                                        <td>59</td>-->
-<!--                                        <td>2012/08/06</td>-->
-<!--                                        <td>$137,500</td>-->
-<!--                                    </tr>-->
-<!--                                    <tr>-->
-<!--                                        <td>Rhona Davidson</td>-->
-<!--                                        <td>Integration Specialist</td>-->
-<!--                                        <td>Tokyo</td>-->
-<!--                                        <td>55</td>-->
-<!--                                        <td>2010/10/14</td>-->
-<!--                                        <td>$327,900</td>-->
-<!--                                    </tr>-->
-
-
                                     </tbody>
                                     <tfoot>
-<!--                                    <tr>-->
-<!--                                        <th>Name</th>-->
-<!--                                        <th>Position</th>-->
-<!--                                        <th>Office</th>-->
-<!--                                        <th>Age</th>-->
-<!--                                        <th>Start date</th>-->
-<!--                                        <th>Salary</th>-->
-<!--                                    </tr>-->
                                     </tfoot>
                                 </table>
                             </div>
