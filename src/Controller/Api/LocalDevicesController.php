@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api;
 
+use App\Enum\OrderStage;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
 use Cake\ORM\TableRegistry;
@@ -34,6 +35,7 @@ class LocalDevicesController extends AppController
         $this->FavouritesProduct = $this->getDbTable('FavouritesProduct');
         $this->ProductRecentlyView = $this->getDbTable('ProductRecentlyView');
         $this->ProductDeliveryAddress = $this->getDbTable('ProductDeliveryAddress');
+        $this->Orders = $this->getDbTable('Orders');
 
         $this->mode = $this->Common->getLocalServerDeviceMode();
     }
@@ -946,18 +948,11 @@ class LocalDevicesController extends AppController
         if ($this->AccessToken->verify()) {
 
             if ($this->request->is('post')) {
-
-                $request_data = file_get_contents("php://input");
-                $request_data = $this->json_decode($request_data, true);
-                $this->log($request_data);
-
                 $request_data = $this->request->getData();
                 $this->log($request_data);
-                $this->log('Upload Image:');
-                $this->log($this->request->getUploadedFile('image'));
 
                 if (!empty($request_data)) {
-                    $image = $this->request->getUploadedFile('image');
+                    $image = isset($request_data['image']) ? $request_data['image'] : '';
                     $user_id = isset($request_data['user_id']) ? $request_data['user_id'] : '';
 
                     $errorMessage = [];
@@ -977,7 +972,6 @@ class LocalDevicesController extends AppController
                             if (is_file(WWW_ROOT . $users['image'])) {
                                 unlink(WWW_ROOT . $users['image']);
                             }
-
                         }
                         $extension=array("jpeg","jpg","png");
                         $file_name= $image->getClientFilename();
@@ -1230,6 +1224,21 @@ class LocalDevicesController extends AppController
                     $fullUrl = Router::fullBaseUrl();
                     if (!empty($getUser['image'])) {
                         $getUser['image'] = $fullUrl . DS . $getUser['image'];
+                    }
+
+                    $getOrder = $this->Orders->find()->where(['order_stage' => OrderStage::PROCESSING, 'user_id' => $getUser['id']])->enableHydration(false)->count();
+                    if (!empty($getOrder)) {
+                        $getUser['tree_planted'] = $getOrder;
+                    } else {
+                        $getUser['tree_planted'] = 0;
+                    }
+
+                    $getFavorites = $this->FavouritesProduct->find()->where(['user_id' => $getUser['id']])->enableHydration(false)->count();
+
+                    if (!empty($getFavorites)) {
+                        $getUser['favorites'] = $getFavorites;
+                    } else {
+                        $getUser['favorites'] = 0;
                     }
 
                     return $this->getResponse()
