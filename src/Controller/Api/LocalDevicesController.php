@@ -11,6 +11,7 @@ use Cake\Utility\Security;
 use ManageUser\Controller\AppController;
 use phpDocumentor\Reflection\Types\This;
 use Cake\Http\Response;
+use PHPMailer\PHPMailer\Exception;
 use Symfony\Component\HttpFoundation\File\File;
 
 class LocalDevicesController extends AppController
@@ -212,17 +213,25 @@ class LocalDevicesController extends AppController
             if (!empty($request_data)) {
                 $email = isset($request_data['User']['email']) ? $request_data['User']['email']:'';
                 $displayName = isset($request_data['User']['display_name']) ? $request_data['User']['display_name']:'';
+                $address = isset($request_data['User']['address']) ? $request_data['User']['address']:'';
+                $phone = isset($request_data['User']['phone']) ? $request_data['User']['phone']:'';
                 $password = isset($request_data['User']['password']) ? $request_data['User']['password']:'';
 
                 $errorMessage = [];
                 if (empty($displayName)) {
-                    array_push($errorMessage,['Required field display name is missing']);
+                    $errorMessage[] = ['Required field display name is missing'];
                 }
                 if (empty($email)) {
-                    array_push($errorMessage,['Required field email is missing']);
+                    $errorMessage[] = ['Required field email is missing'];
+                }
+                if (empty($address)) {
+                    $errorMessage[] = ['Required field address is missing'];
+                }
+                if (empty($phone)) {
+                    $errorMessage[] = ['Required field phone is missing'];
                 }
                 if (empty($password)) {
-                    array_push($errorMessage, ['Required field password is missing']);
+                    $errorMessage[] = ['Required field password is missing'];
                 }
 
                 if (count($errorMessage) == 0) {
@@ -232,6 +241,8 @@ class LocalDevicesController extends AppController
                         $users = $this->Users->newEmptyEntity();
                         $userData['display_name'] = $displayName;
                         $userData['email'] = $email;
+                        $userData['address'] = $address;
+                        $userData['phone_no'] = $phone;
                         $userData['password'] = Security::hash($password, null, true);
                         $userData['role_id'] = $roles[1]['id'];
                         $userData['status'] = 1;
@@ -239,6 +250,13 @@ class LocalDevicesController extends AppController
                         $users = $this->Users->patchEntity($users, $userData);
                         $user = $this->Users->save($users);
                         if ($user->id) {
+
+                            try {
+                                $this->getComponent('EmailHandler')->emailSend($email, $displayName);
+                            } catch (Exception $e) {
+                                $this->log($e->getMessage());
+                            }
+
                             return $this->getResponse()
                                 ->withStatus(200)
                                 ->withType('application/json')

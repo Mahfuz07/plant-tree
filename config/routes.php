@@ -71,6 +71,13 @@ return static function (RouteBuilder $routes) {
 
         $routes->connect('/news/delete/*', ['controller' => 'News',  'action' => 'delete']);
 
+        //Orders Sections
+        $routes->connect('/orders', ['controller' => 'Orders',  'action' => 'index']);
+
+        $routes->connect('/orders/view/*', ['controller' => 'News',  'action' => 'edit']);
+
+        $routes->connect('/orders/cancel/*', ['controller' => 'News',  'action' => 'delete']);
+
 //      Product Sections
         $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
 

@@ -8,6 +8,9 @@ use Cake\Event\EventInterface;
 use Cake\Mailer\Email;
 use Cake\Mailer\Mailer;
 use Cake\Utility\Security;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 
 class CustomersController extends AppController
 {

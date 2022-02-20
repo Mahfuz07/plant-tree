@@ -83,8 +83,8 @@
                     <i class="fa fa-users menu-icon"></i><span class="nav-text">Orders</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="/admin/news">News</a></li>
-                    <li><a href="/admin/news/add">Add News</a></li>
+                    <li><a href="/admin/orders">Orders</a></li>
+                    <li><a href="/admin/news/add">Cancel Order</a></li>
                 </ul>
             </li>
         </ul>

@@ -3,7 +3,7 @@
 ***********************************-->
 <div class="nav-header">
     <div class="brand-logo">
-        <h2 class="text-white" style=" padding: 22px 50px">Plant Tree</h2>
+        <h2 class="text-white" style=" padding: 22px 50px">Plan Tree</h2>
         <!--            <a href="index.html">-->
         <!--                <b class="logo-abbr"><img src="images/logo.png" alt=""> </b>-->
         <!--                <span class="logo-compact"><img src="./images/logo-compact.png" alt=""></span>-->
