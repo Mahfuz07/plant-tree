@@ -12,13 +12,13 @@ class OrdersController extends AppController
     {
         parent::initialize();
         $this->Auth->allow(['login', 'logout', 'checkEmail', 'resetPassword']);
-        $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit', 'uploadImage']);
+        $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit', 'uploadImage', 'view']);
     }
 
     public function beforeFilter(EventInterface $event)
     {
         parent::beforeFilter($event);
-        $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit', 'uploadImage']);
+//        $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit', 'uploadImage']);
 
         $this->Users = $this->getDbTable('ManageUser.Users');
         $this->Roles =  $this->getDbTable('ManageUser.Roles');
@@ -42,6 +42,27 @@ class OrdersController extends AppController
 
         $this->set('orders', $orders);
 
+    }
+
+    public function view($id) {
+
+        if (!empty($id)) {
+            $orders = $this->Orders->find()->where(['id' => $id])->first();
+
+            if (!empty($orders)) {
+                $orderProducts = $this->OrderProducts->find()->where(['order_id' => $id])->toArray();
+
+                if (!empty($orderProducts)) {
+                    $orderProductAddress = $this->OrderProductAddress->find()->where(['order_product_id in (SELECT id FROM order_products WHERE order_id = "'. $id .'")'])->toArray();
+
+                    $this->set('order_product_address', $orderProductAddress);
+                    $this->set('order_product', $orderProducts);
+                    $this->set('orders', $orders);
+                }
+            }
+        } else {
+
+        }
     }
 
 }
