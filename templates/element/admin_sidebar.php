@@ -22,14 +22,6 @@
             </li>
             <li class="mega-menu mega-menu-sm">
                 <a class="has-arrow" href="javascript:void()" aria-expanded="false">
-                    <i class="fa fa-shopping-cart menu-icon"></i><span class="nav-text">Orders</span>
-                </a>
-                <ul aria-expanded="false">
-                    <li><a href="./layout-blank.html">Orders</a></li>
-                </ul>
-            </li>
-            <li class="mega-menu mega-menu-sm">
-                <a class="has-arrow" href="javascript:void()" aria-expanded="false">
                     <i class="fa fa-users menu-icon"></i><span class="nav-text">Customers</span>
                 </a>
                 <ul aria-expanded="false">

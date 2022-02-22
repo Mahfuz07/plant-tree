@@ -45,8 +45,20 @@
 
                             <div class="row">
                                 <div class="col-md-12">
-                                    <?php echo $this->Flash->render('admin_success'); ?>
-                                    <?php echo $this->Flash->render('admin_error'); ?>
+                                    <?php
+                                    $success = $this->Flash->render('success');
+                                    $error = $this->Flash->render('error');
+                                    if ($success) { ?>
+                                        <div class="alert alert-success">
+                                            <?php echo $success; ?>
+                                        </div>
+                                    <?php }
+
+                                    if ($error) { ?>
+                                        <div class="alert alert-danger">
+                                            <?php echo $error; ?>
+                                        </div>
+                                    <?php } ?>
                                 </div>
                             </div>
 
