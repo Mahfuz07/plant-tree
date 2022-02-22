@@ -54,7 +54,7 @@
                     <i class="fa fa-users menu-icon"></i><span class="nav-text">Customers</span>
                 </a>
                 <ul aria-expanded="false">
-                    <li><a href="./layout-blank.html">Customers</a></li>
+                    <li><a href="/admin/customers">Customers</a></li>
                     <li><a href="/admin/customers/add">Add Customer</a></li>
                     <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
                     <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->
@@ -84,7 +84,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="/admin/orders">Orders</a></li>
-                    <li><a href="/admin/news/add">Cancel Order</a></li>
+                    <li><a href="/admin/orders/cancel-orders">Cancel Order</a></li>
                 </ul>
             </li>
         </ul>

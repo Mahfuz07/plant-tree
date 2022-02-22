@@ -34,6 +34,8 @@ class UsersController extends AppController
 
         $this->Users = $this->getDbTable('ManageUser.Users');
         $this->Roles = $this->getDbTable('ManageUser.Roles');
+        $this->Orders = $this->getDbTable('Orders');
+        $this->Products = $this->getDbTable('Products');
 
          $this->Auth->allow(['login', 'logout', 'checkEmail', 'resetPassword']);
     }
@@ -57,6 +59,14 @@ class UsersController extends AppController
 
     public function dashboard()
     {
+
+        $totalProduct = $this->Products->find()->where()->count();
+        $totalOrder = $this->Orders->find()->where()->count();
+        $totalCustomer = $this->Users->find()->where(['role_id' => 2])->count();
+
+        $this->set('total_order', $totalOrder);
+        $this->set('total_product', $totalProduct);
+        $this->set('total_customer', $totalCustomer);
 
     }
 

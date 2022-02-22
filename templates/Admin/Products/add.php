@@ -82,30 +82,15 @@
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-Image">
                                         </label>
-<!--                                        <div class="col-lg-6">-->
-<!--                                            <div id="uploaded_image"></div>-->
-<!--                                        </div>-->
 
                                     </div>
-<!--                                    <div class="form-group row">-->
-<!--                                        <label class="col-lg-4 col-form-label" for="val-Image">Image-->
-<!--<!--                                            <span class="text-danger">*</span>-->-->
-<!--                                        </label>-->
-<!--                                        <div class="col-lg-6">-->
-<!--                                            <div class="panel panel-default">-->
-<!--                                                <input type="file" name="upload_image" id="upload_image" data-toggle="modal" data-target="#basicModal"/>-->
-<!--                                            </div>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
 
                                     <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-Image">Image
-                                            <!--                                            <span class="text-danger">*</span>-->
                                         </label>
                                         <div class="col-lg-6">
                                             <div class="panel panel-default">
-<!--                                                <input type="file" name="upload_image[]" multiple />-->
-                                                <?php echo $this->Form->input('upload_image[]', ['type' => 'file', 'label' => false, 'multiple' => true]); ?>
+                                                <?php echo $this->Form->input('upload_image[]', ['type' => 'file', 'label' => false, 'multiple' => true, 'accept' => 'image/png, image/jpeg, image/jpg']); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -219,11 +204,12 @@
                                     </div>
 
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label"><a href="#">Published</a>  <span class="text-danger">*</span>
+                                        <label class="col-lg-4 col-form-label"><a href="#">Published</a>
+<!--                                            <span class="text-danger">*</span>-->
                                         </label>
                                         <div class="col-lg-8">
                                             <label class="css-control css-control-primary css-checkbox" for="val-terms">
-                                                <input type="checkbox" class="css-control-input" id="val-terms" name="published" value="1" required> <span class="css-control-indicator"></span>  checkbox</label>
+                                                <input type="checkbox" class="css-control-input" id="val-terms" name="published" value="1"> <span class="css-control-indicator"></span>  checkbox</label>
                                             <!--                                            --><?php
                                             //                                            echo $this->Form->checkbox('published', array('type' => 'checkbox', 'checked'=>false, 'class' => 'form-control', 'label' => 'Published'));
                                             //                                            ?>

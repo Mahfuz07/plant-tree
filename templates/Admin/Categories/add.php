@@ -164,11 +164,12 @@
 <!--                                        </div>-->
 <!--                                    </div>-->
                                     <div class="form-group row">
-                                        <label class="col-lg-4 col-form-label"><a href="#">Published</a>  <span class="text-danger">*</span>
+                                        <label class="col-lg-4 col-form-label"><a href="#">Published</a>
+<!--                                            <span class="text-danger">*</span>-->
                                         </label>
                                         <div class="col-lg-8">
                                             <label class="css-control css-control-primary css-checkbox" for="val-terms">
-                                                <input type="checkbox" class="css-control-input" id="val-terms" name="published" value="1" required> <span class="css-control-indicator"></span>  checkbox</label>
+                                                <input type="checkbox" class="css-control-input" id="val-terms" name="published" value="1"> <span class="css-control-indicator"></span>  checkbox</label>
 <!--                                            --><?php
 //                                            echo $this->Form->checkbox('published', array('type' => 'checkbox', 'checked'=>false, 'class' => 'form-control', 'label' => 'Published'));
 //                                            ?>

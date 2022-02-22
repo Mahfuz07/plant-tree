@@ -27,7 +27,7 @@ class ProductsController extends AppController
 
     public function index() {
 
-        $products = $this->Products->find('all')->where()->toArray();
+        $products = $this->Products->find('all')->where()->orderDesc('id')->toArray();
 
         if (!empty($products)) {
 
@@ -51,7 +51,7 @@ class ProductsController extends AppController
         if ($this->request->getData()) {
 
             $requestData = $this->request->getData();
-            $slug = $this->Categories->find()->where(['slug' => $requestData['slug']])->first();
+            $slug = $this->Products->find()->where(['slug' => $requestData['slug']])->first();
             if (empty($slug)) {
                 if (!empty($requestData)) {
                     $products = $this->Products->newEmptyEntity();
@@ -67,7 +67,7 @@ class ProductsController extends AppController
                             $image_name = $key . '-' .$requestData['slug'] . '-' . strtotime(date('Y-m-d H:i:s'));
                             $targetPath = WWW_ROOT . 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
 
-                            if(in_array($ext,$extension)) {
+                            if(in_array(strtolower($ext),$extension)) {
                                 if(!file_exists($targetPath)) {
                                     $tmp_name->moveTo($targetPath);
                                     $productImages = $this->ProductImages->newEmptyEntity();
@@ -82,11 +82,12 @@ class ProductsController extends AppController
                                 }
                             }
                             else {
-                                array_push($error,"$file_name, ");
+                                $this->Flash->success('Oops Image Extension Not Match', ['key' => 'error']);
+                                $this->redirect('/admin/products/upload-image/'. $products->id);
                             }
                         }
                         $this->Flash->success('Product has been saved!', ['key' => 'success']);
-                        $this->redirect('/admin/dashboard');
+                        $this->redirect('/admin/products');
                     } else {
                         $this->Flash->error('Oops Product not has been saved!', ['key' => 'error']);
                         $this->redirect('/admin/products/add');
@@ -95,6 +96,9 @@ class ProductsController extends AppController
                     $this->Flash->error('Slug already exit!', ['key' => 'error']);
                     $this->redirect('/admin/categories/add');
                 }
+            } else {
+                $this->Flash->error('Slug already exit!', ['key' => 'error']);
+                $this->redirect('/admin/products/add');
             }
         }
         $this->set('categoryList', $categoryList);

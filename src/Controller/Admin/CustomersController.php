@@ -36,6 +36,9 @@ class CustomersController extends AppController
 
     public function index () {
 
+        $customers = $this->Users->find()->where(['role_id' => 2])->toArray();
+
+        $this->set('customers', $customers);
     }
 
     public function add () {

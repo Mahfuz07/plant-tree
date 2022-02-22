@@ -62,6 +62,8 @@ return static function (RouteBuilder $routes) {
 //      Customer Sections
         $routes->connect('/customers/add', ['controller' => 'Customers',  'action' => 'add']);
 
+        $routes->connect('/customers', ['controller' => 'Customers',  'action' => 'index']);
+
         $routes->connect('/customers/check-email', ['controller' => 'Customers',  'action' => 'checkEmail']);
 
         //News Sections
@@ -74,9 +76,11 @@ return static function (RouteBuilder $routes) {
         //Orders Sections
         $routes->connect('/orders', ['controller' => 'Orders',  'action' => 'index']);
 
+        $routes->connect('/orders/cancel-orders', ['controller' => 'Orders',  'action' => 'cancelOrderView']);
+
         $routes->connect('/orders/view/*', ['controller' => 'Orders',  'action' => 'view']);
 
-        $routes->connect('/orders/cancel/*', ['controller' => 'News',  'action' => 'delete']);
+        $routes->connect('/orders/cancel/*', ['controller' => 'Orders',  'action' => 'cancelOrder']);
 
 //      Product Sections
         $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);

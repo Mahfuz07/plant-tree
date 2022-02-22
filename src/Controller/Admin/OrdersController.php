@@ -44,6 +44,13 @@ class OrdersController extends AppController
 
     }
 
+    public function cancelOrderView() {
+
+        $orders = $this->Orders->find('all')->where(['order_stage' => 'Cancel'])->orderDesc('id')->toArray();
+
+        $this->set('orders', $orders);
+    }
+
     public function view($id) {
 
         if (!empty($id)) {
@@ -60,9 +67,29 @@ class OrdersController extends AppController
                     $this->set('orders', $orders);
                 }
             }
-        } else {
-
         }
+
+    }
+
+    public function cancelOrder($id) {
+
+        if (!empty($id)) {
+            $orders = $this->Orders->find()->where(['id' => $id])->first();
+
+            if (!empty($orders)) {
+                $orderParams['order_stage'] = 'Cancel';
+                $orders = $this->Orders->patchEntity($orders, $orderParams);
+                $orders = $this->Orders->save($orders);
+                if ($orders->id) {
+                    $this->Flash->success('Order has been cancelled', ['key'=>'success']);
+                    $this->redirect('/admin/orders/cancel-orders');
+                } else {
+                    $this->Flash->success('Oops something wrong!', ['key'=>'success']);
+                    $this->redirect('/admin/orders');
+                }
+            }
+        }
+
     }
 
 }

@@ -122,8 +122,6 @@ use Cake\Routing\Router;
                                             <td><?= $order['customer_email'] ?></td>
                                             <td><?= $order['customer_phone'] ?></td>
                                             <td><?= $this->Html->link('View',['controller' => 'Orders' , 'action' => 'view', $order['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?>
-                                                &nbsp;&nbsp;&nbsp;
-                                                <?= $this->Html->link('Cancel',['controller' => 'Orders' , 'action' => 'cancel', $order['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?></td>
                                         </tr>
                                     <?php } ?>
                                     </tbody>
