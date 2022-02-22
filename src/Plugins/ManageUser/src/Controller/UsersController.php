@@ -102,23 +102,28 @@ class UsersController extends AppController
                 $loggedIn = [];
                 $users = $this->Users->find()->where($conditions)->first();
 
-                $users['Role'] = $role;
-                $response = json_decode($users, true);
-                if( !empty($response) && isset($response['status'])){
-                    $loggedIn['User'] = $response;
-                }
+                if (!empty($users)) {
+                    $users['Role'] = $role;
+                    $response = json_decode($users, true);
+                    if( !empty($response) && isset($response['status'])){
+                        $loggedIn['User'] = $response;
+                    }
 
-                if (!empty($loggedIn['User']['Role'])) {
-                    $this->sessionWrite('Auth', $loggedIn);
-                    $this->Auth->setUser($loggedIn);
-                    $success = true;
-                }
+                    if (!empty($loggedIn['User']['Role'])) {
+                        $this->sessionWrite('Auth', $loggedIn);
+                        $this->Auth->setUser($loggedIn);
+                        $success = true;
+                    }
 
-                if ($success) {
-                    return $this->redirect('admin/dashboard');
+                    if ($success) {
+                        return $this->redirect('admin/dashboard');
+                    } else {
+                        $this->Flash->error('Email or password doesn\'t match', ['key' => 'error']);
+                    }
                 } else {
                     $this->Flash->error('Email or password doesn\'t match', ['key' => 'error']);
                 }
+
             }
         }
     }

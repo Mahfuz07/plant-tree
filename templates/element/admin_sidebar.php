@@ -18,16 +18,6 @@
                 <ul aria-expanded="false">
                     <li><a href="/admin/products">Product</a></li>
                     <li><a href="/admin/categories">Category</a></li>
-                    <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
-                    <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->
-                    <!--                        <li><a href="./layout-vertical.html">Vertical</a></li>-->
-                    <!--                        <li><a href="./layout-horizontal.html">Horizontal</a></li>-->
-                    <!--                        <li><a href="./layout-boxed.html">Boxed</a></li>-->
-                    <!--                        <li><a href="./layout-wide.html">Wide</a></li>-->
-                    <!---->
-                    <!---->
-                    <!--                        <li><a href="./layout-fixed-header.html">Fixed Header</a></li>-->
-                    <!--                        <li><a href="layout-fixed-sidebar.html">Fixed Sidebar</a></li>-->
                 </ul>
             </li>
             <li class="mega-menu mega-menu-sm">
@@ -36,17 +26,6 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="./layout-blank.html">Orders</a></li>
-                    <!--                        <li><a href="./layout-one-column.html">One Column</a></li>-->
-                    <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
-                    <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->
-                    <!--                        <li><a href="./layout-vertical.html">Vertical</a></li>-->
-                    <!--                        <li><a href="./layout-horizontal.html">Horizontal</a></li>-->
-                    <!--                        <li><a href="./layout-boxed.html">Boxed</a></li>-->
-                    <!--                        <li><a href="./layout-wide.html">Wide</a></li>-->
-                    <!---->
-                    <!---->
-                    <!--                        <li><a href="./layout-fixed-header.html">Fixed Header</a></li>-->
-                    <!--                        <li><a href="layout-fixed-sidebar.html">Fixed Sidebar</a></li>-->
                 </ul>
             </li>
             <li class="mega-menu mega-menu-sm">
@@ -56,16 +35,6 @@
                 <ul aria-expanded="false">
                     <li><a href="/admin/customers">Customers</a></li>
                     <li><a href="/admin/customers/add">Add Customer</a></li>
-                    <!--                        <li><a href="./layout-two-column.html">Two column</a></li>-->
-                    <!--                        <li><a href="./layout-compact-nav.html">Compact Nav</a></li>-->
-                    <!--                        <li><a href="./layout-vertical.html">Vertical</a></li>-->
-                    <!--                        <li><a href="./layout-horizontal.html">Horizontal</a></li>-->
-                    <!--                        <li><a href="./layout-boxed.html">Boxed</a></li>-->
-                    <!--                        <li><a href="./layout-wide.html">Wide</a></li>-->
-                    <!---->
-                    <!---->
-                    <!--                        <li><a href="./layout-fixed-header.html">Fixed Header</a></li>-->
-                    <!--                        <li><a href="layout-fixed-sidebar.html">Fixed Sidebar</a></li>-->
                 </ul>
             </li>
             <li class="mega-menu mega-menu-sm">
