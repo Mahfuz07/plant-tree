@@ -3,14 +3,14 @@
 ***********************************-->
 <div class="nav-header">
     <div class="brand-logo">
-        <h2 class="text-white" style=" padding: 22px 50px">Plan Tree</h2>
-        <!--            <a href="index.html">-->
-        <!--                <b class="logo-abbr"><img src="images/logo.png" alt=""> </b>-->
-        <!--                <span class="logo-compact"><img src="./images/logo-compact.png" alt=""></span>-->
-        <!--                <span class="brand-title">-->
-        <!--                        <img src="images/logo-text.png" alt="">-->
-        <!--                    </span>-->
-        <!--            </a>-->
+<!--        <h2 class="text-white" style=" padding: 22px 50px">Plan Tree</h2>-->
+                    <a href="index.html">
+                        <b class="logo-abbr"><img src="/webroot/images/logo.png" alt=""> </b>
+                        <span class="logo-compact"><img src="/webroot/images/logo-compact.png" alt=""></span>
+                        <span class="brand-title">
+                                <img src="/webroot/images/logo-compact.png" alt="">
+                            </span>
+                    </a>
     </div>
 </div>
 <!--**********************************

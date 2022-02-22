@@ -22,17 +22,18 @@
 <!--    <main class="main">-->
 <!--        <div class="container">-->
             <?= $this->Flash->render() ?>
-
+<div id="main-wrapper">
 <?php
     $allow = false;
     if ($this->request->getSession()->read('Auth')) { ?>
        <?= $this->element('admin_header') ?>
        <?= $this->element('admin_sidebar') ?>
+
    <?php } ?>
 
         <?= $this->fetch('content') ?>
         <?= $this->element('admin_footer') ?>
-
+</div>
 <!--        </div>-->
 <!--    </main>-->
     <footer>

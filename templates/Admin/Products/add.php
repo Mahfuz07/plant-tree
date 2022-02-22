@@ -1,45 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <!--    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>-->
-    <!-- Favicon icon -->
-    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
-    <!-- Custom Stylesheet -->
-    <link href="/webroot/css/style.css" rel="stylesheet">
-
-    <style>
-        .message.alert-success {
-            background: red;
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<!--*******************
-    Preloader start
-********************-->
-<div id="preloader">
-    <div class="loader">
-        <svg class="circular" viewBox="25 25 50 50">
-            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
-        </svg>
-    </div>
-</div>
-<!--*******************
-    Preloader end
-********************-->
-
-<!--**********************************
-    Main wrapper start
-***********************************-->
-<div id="main-wrapper">
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!---->
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+<!--    <meta name="viewport" content="width=device-width,initial-scale=1">-->
+<!--    <!--    <title>Quixlab - Bootstrap Admin Dashboard Template by Themefisher.com</title>-->-->
+<!--    <!-- Favicon icon -->-->
+<!--    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">-->
+<!--    <!-- Custom Stylesheet -->-->
+<!--    <link href="/webroot/css/style.css" rel="stylesheet">-->
+<!---->
+<!--    <style>-->
+<!--        .message.alert-success {-->
+<!--            background: red;-->
+<!--        }-->
+<!---->
+<!--    </style>-->
+<!---->
+<!--</head>-->
+<!---->
+<!--<body>-->
+<!---->
+<!--<!--*******************-->
+<!--    Preloader start-->
+<!--********************-->-->
+<!--<div id="preloader">-->
+<!--    <div class="loader">-->
+<!--        <svg class="circular" viewBox="25 25 50 50">-->
+<!--            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />-->
+<!--        </svg>-->
+<!--    </div>-->
+<!--</div>-->
+<!--<!--*******************-->
+<!--    Preloader end-->
+<!--********************-->-->
+<!---->
+<!--<!--**********************************-->
+<!--    Main wrapper start-->
+<!--***********************************-->-->
+<!--<div id="main-wrapper">-->
 
     <!--**********************************
         Content body start
@@ -230,33 +230,10 @@
         <!-- #/ container -->
     </div>
 
-</div>
-
-
-
-</body>
-
-</html>
-<!--id="uploadimageModal"-->
-<!--<div class="modal fade" id="basicModal">-->
-<!--    <div class="modal-dialog">-->
-<!--        <div class="modal-content">-->
-<!--            <div class="modal-header">-->
-<!--                <h5 class="modal-title">Crop & Upload Image</h5>-->
-<!--                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>-->
-<!--                </button>-->
-<!--            </div>-->
-<!--            <div class="modal-body">-->
-<!--                <div class="row">-->
-<!--                    <div class="col-md-12 text-center">-->
-<!--                        <div id="image_demo" style="margin-top:30px"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="modal-footer">-->
-<!--                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
-<!--                <button type="button" class="btn btn-primary crop_image" data-dismiss="modal">Save changes</button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
 <!--</div>-->
+<!---->
+<!---->
+<!---->
+<!--</body>-->
+<!---->
+<!--</html>-->
