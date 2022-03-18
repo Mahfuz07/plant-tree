@@ -45,7 +45,7 @@
                 </a>
                 <ul aria-expanded="false">
                     <li><a href="/admin/orders">Orders</a></li>
-                    <li><a href="/admin/orders/cancel-orders">Cancel Order</a></li>
+<!--                    <li><a href="/admin/orders/cancel-orders">Cancel Order</a></li>-->
                 </ul>
             </li>
         </ul>

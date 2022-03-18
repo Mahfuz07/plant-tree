@@ -66,6 +66,7 @@ use Cake\Routing\Router;
                                         <th>Customer Name</th>
                                         <th>Customer Email</th>
                                         <th>Customer Phone</th>
+                                        <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -75,10 +76,11 @@ use Cake\Routing\Router;
                                             <td><?= $orders['order_id'] ?></td>
                                             <td><?= $orders['order_stage'] ?></td>
                                             <td><?= $orders['tran_id'] ?></td>
-                                            <td><?= $orders['order_total'] ?></td>
+                                            <td><?= number_format($orders['order_total'], 2) ?></td>
                                             <td><?= $orders['customer_name'] ?></td>
                                             <td><?= $orders['customer_email'] ?></td>
                                             <td><?= $orders['customer_phone'] ?></td>
+                                            <td><?= $this->Html->link('Edit',['controller' => 'Orders' , 'action' => 'orderEdit', $orders['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?>
                                         </tr>
 <!--                                    --><?php // ?>
                                     </tbody>
@@ -106,6 +108,7 @@ use Cake\Routing\Router;
                                         <th>Quantity</th>
                                         <th>Total Price</th>
                                         <th>Delivery Address</th>
+                                        <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -115,15 +118,16 @@ use Cake\Routing\Router;
                                                 <td><?= $product['product_id'] ?></td>
                                                 <td><?= 'Image' ?></td>
                                                 <td><?= $product['product_name'] ?></td>
-                                                <td><?= $product['product_price'] ?></td>
+                                                <td><?= number_format($product['product_price'], 2) ?></td>
                                                 <td><?= $product['product_quantity'] ?></td>
-                                                <td><?= $product['product_final_price'] ?></td>
+                                                <td><?= number_format($product['product_final_price'], 2) ?></td>
                                                 <?php foreach ($order_product_address as $address) {
                                                     if ($address['order_product_id'] == $product['id']) {?>
 
                                                     <td><?= $address['address'] ?></td>
 
                                                 <?php }} ?>
+                                                <td><?= $this->Html->link('Edit',['controller' => 'Orders' , 'action' => 'orderProductEdit', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?>
                                             </tr>
                                         <?php } ?>
                                     </tbody>

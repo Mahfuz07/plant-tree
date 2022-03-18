@@ -32,7 +32,10 @@
    <?php } ?>
 
         <?= $this->fetch('content') ?>
-        <?= $this->element('admin_footer') ?>
+
+    <?php if ($this->request->getSession()->read('Auth')) {?>
+    <?= $this->element('admin_footer') ?>
+    <?php  } ?>
 </div>
 <!--        </div>-->
 <!--    </main>-->

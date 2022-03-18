@@ -5,6 +5,8 @@ namespace App\Controller\Admin;
 use App\Controller\AppController;
 use Cake\Datasource\ConnectionManager;
 use Cake\Event\EventInterface;
+use phpDocumentor\Reflection\Types\This;
+use PHPMailer\PHPMailer\Exception;
 
 class OrdersController extends AppController
 {
@@ -12,7 +14,7 @@ class OrdersController extends AppController
     {
         parent::initialize();
         $this->Auth->allow(['login', 'logout', 'checkEmail', 'resetPassword']);
-        $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit', 'uploadImage', 'view']);
+        $this->Security->setConfig('unlockedActions', ['add', 'checkEmail', 'edit', 'uploadImage', 'view', 'orderEdit', 'orderProductEdit']);
     }
 
     public function beforeFilter(EventInterface $event)
@@ -38,9 +40,15 @@ class OrdersController extends AppController
 
     public function index() {
 
-        $orders = $this->Orders->find('all')->where()->orderDesc('id')->toArray();
+        $all_orders = $this->Orders->find('all')->where()->orderDesc('id')->toArray();
+        $cancel_orders = $this->Orders->find('all')->where(['order_stage' => 'Cancel'])->orderDesc('id')->toArray();
+        $processing_orders = $this->Orders->find('all')->where(['order_stage' => 'Processing'])->orderDesc('id')->toArray();
+        $complete_orders = $this->Orders->find('all')->where(['order_stage' => 'Complete'])->orderDesc('id')->toArray();
 
-        $this->set('orders', $orders);
+        $this->set('processing_orders', $processing_orders);
+        $this->set('complete_orders', $complete_orders);
+        $this->set('cancel_orders', $cancel_orders);
+        $this->set('all_orders', $all_orders);
 
     }
 
@@ -81,8 +89,38 @@ class OrdersController extends AppController
                 $orders = $this->Orders->patchEntity($orders, $orderParams);
                 $orders = $this->Orders->save($orders);
                 if ($orders->id) {
+                    try {
+                        $this->getComponent('EmailHandler')->cancelOrderEmail($orders);
+                    } catch (Exception $e) {
+                        $this->log($e->getMessage());
+                    }
                     $this->Flash->success('Order has been cancelled', ['key'=>'success']);
-                    $this->redirect('/admin/orders/cancel-orders');
+                    $this->redirect('/admin/orders');
+                } else {
+                    $this->Flash->success('Oops something wrong!', ['key'=>'success']);
+                    $this->redirect('/admin/orders');
+                }
+            }
+        }
+    }
+
+    public function completeOrder($id) {
+
+        if (!empty($id)) {
+            $orders = $this->Orders->find()->where(['id' => $id])->first();
+
+            if (!empty($orders)) {
+                $orderParams['order_stage'] = 'Complete';
+                $orders = $this->Orders->patchEntity($orders, $orderParams);
+                $orders = $this->Orders->save($orders);
+                if ($orders->id) {
+                    try {
+                        $this->getComponent('EmailHandler')->cancelOrderEmail($orders);
+                    } catch (Exception $e) {
+                        $this->log($e->getMessage());
+                    }
+                    $this->Flash->success('Order has been cancelled', ['key'=>'success']);
+                    $this->redirect('/admin/orders');
                 } else {
                     $this->Flash->success('Oops something wrong!', ['key'=>'success']);
                     $this->redirect('/admin/orders');
@@ -90,6 +128,45 @@ class OrdersController extends AppController
             }
         }
 
+    }
+
+    public function orderEdit($id) {
+        if (!empty($id)) {
+            $orders = $this->Orders->find()->where(['id' => $id])->first();
+            if ($this->request->is('put')) {
+                $orders = $this->Orders->patchEntity($orders, $this->request->getData());
+                if ($this->Orders->save($orders)) {
+                    $this->Flash->success('Order data has been save successfully', ['key'=>'success']);
+                    $this->redirect('/admin/orders/view/' . $id);
+                } else {
+                    $this->Flash->success('Oops something wrong', ['key'=>'success']);
+                    $this->redirect('/admin/orders/order-edit/' . $id);
+                }
+            }
+            $this->set('order', $orders);
+        }
+    }
+
+    public function orderProductEdit($id) {
+        if (!empty($id)) {
+            $orderProducts = $this->OrderProducts->find()->where(['id' => $id])->first();
+            $orderProductsAddress = $this->OrderProductAddress->find()->where(['order_product_id' => $orderProducts['id']])->first();
+            if ($this->request->is('put')) {
+                $orderProducts = $this->OrderProducts->patchEntity($orderProducts, $this->request->getData());
+                if ($this->OrderProducts->save($orderProducts)) {
+                    $postData['address'] = $this->request->getData()['address'];
+                    $orderProductsAddress = $this->OrderProductAddress->patchEntity($orderProductsAddress, $postData);
+                    $this->OrderProductAddress->save($orderProductsAddress);
+                    $this->Flash->success('Order data has been save successfully', ['key'=>'success']);
+                    $this->redirect('/admin/orders/view/' . $orderProducts['order_id']);
+                } else {
+                    $this->Flash->success('Oops something wrong', ['key'=>'success']);
+                    $this->redirect('/admin/orders/order-edit/' . $id);
+                }
+            }
+            $this->set('order_product', $orderProducts);
+            $this->set('order_product_address', $orderProductsAddress['address']);
+        }
     }
 
 }

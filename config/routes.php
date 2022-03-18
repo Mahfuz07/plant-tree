@@ -82,6 +82,12 @@ return static function (RouteBuilder $routes) {
 
         $routes->connect('/orders/cancel/*', ['controller' => 'Orders',  'action' => 'cancelOrder']);
 
+        $routes->connect('/orders/complete/*', ['controller' => 'Orders',  'action' => 'completeOrder']);
+
+        $routes->connect('/orders/order-edit/*', ['controller' => 'Orders',  'action' => 'orderEdit']);
+
+        $routes->connect('/orders/order-product-edit/*', ['controller' => 'Orders',  'action' => 'orderProductEdit']);
+
 //      Product Sections
         $routes->connect('/products/add', ['controller' => 'Products',  'action' => 'add']);
 

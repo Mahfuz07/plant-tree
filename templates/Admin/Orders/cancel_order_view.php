@@ -76,7 +76,7 @@ use Cake\Routing\Router;
                                             <td><?= $order['order_id'] ?></td>
                                             <td><?= $order['order_stage'] ?></td>
                                             <td><?= $order['tran_id'] ?></td>
-                                            <td><?= $order['order_total'] ?></td>
+                                            <td><?= number_format($order['order_total'], 2) ?></td>
                                             <td><?= $order['customer_name'] ?></td>
                                             <td><?= $order['customer_email'] ?></td>
                                             <td><?= $order['customer_phone'] ?></td>
