@@ -102,6 +102,24 @@
                                         </div>
                                     </div>
                                     <div class="form-group row">
+                                        <label class="col-lg-4 col-form-label" for="val-email">Customer Email <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="col-lg-6">
+                                            <!--                                            <input type="text" class="form-control" id="val-email" name="val-email" placeholder="Your valid email..">-->
+                                            <?php
+                                            echo $this->Form->input('customer_email', array(
+                                                'type' =>'text',
+                                                'class' =>'form-control',
+                                                'id' =>'val-display-name',
+                                                'label' =>false,
+                                                'placeholder' =>'Enter Customer Email',
+                                                'required' => true
+                                            ));
+                                            ?>
+                                            <span class="registrationFormAlert" style="color:#dc0000;" id="Exist"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
                                         <label class="col-lg-4 col-form-label" for="val-slug">Customer Phone No <span class="text-danger">*</span>
                                         </label>
                                         <div class="col-lg-6">
