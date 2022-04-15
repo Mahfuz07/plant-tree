@@ -1,6 +1,15 @@
 <?php
 ?>
 
+<style>
+    @media only screen and (max-width: 600px) {
+        .feature-image {
+            width: 100%;
+            height: auto;
+        }
+    }
+</style>
+
 
 
 <div class="container-fluid">
@@ -14,7 +23,7 @@
             </div>
             <div class="card-footer border-0 bg-transparent">
                 <div class="row center">
-                    <div><?php echo $news['content']?></div>
+                    <div class="p-4"><?php echo $news['content']?></div>
                 </div>
             </div>
         </div>
