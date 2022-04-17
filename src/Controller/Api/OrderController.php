@@ -384,9 +384,9 @@ class OrderController extends AppController
                         $user_id = $orderSessionsJsonDecode['user_info']['id'];
                         $setOrderData = $this->setOrder($orderSessionsJsonDecode, $requestData);
 
-                        $order_id = $this->saveOrderData($setOrderData);
+                        $order = $this->saveOrderData($setOrderData);
 
-                        $orderProducts = $this->setOrderProduct($orderSessionsJsonDecode['products'], $order_id);
+                        $orderProducts = $this->setOrderProduct($orderSessionsJsonDecode['products'], $order['id']);
 
                         $success = false;
                         foreach ($orderProducts['products'] as $key => $products) {
@@ -409,7 +409,9 @@ class OrderController extends AppController
                             $orderStatus['order_status'] = 1;
                             $orderSessions = $this->OrderSessions->patchEntity($orderSessions, $orderStatus);
                             if ($this->OrderSessions->save($orderSessions)) {
-                                return true;
+
+                                $this->getComponent('EmailHandler')->OrderCreateEmail($order);
+                                return $order['id'];
                             }else {
                                 return false;
                             }
@@ -462,7 +464,7 @@ class OrderController extends AppController
             $Orders = $this->Orders->patchEntity($Orders, $ordersData);
             $Orders = $this->Orders->save($Orders);
             if ($Orders) {
-                return $Orders['id'];
+                return $Orders;
             } else {
                 return false;
             }

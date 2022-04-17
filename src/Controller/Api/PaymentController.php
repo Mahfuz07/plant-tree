@@ -191,9 +191,9 @@ class PaymentController extends AppController
                 if (!empty($sslCommerzOrderSessions)) {
 
                     $orderController = new OrderController();
-                    $status = $orderController->processOrder($tran_id, $requestData);
+                    $order_id = $orderController->processOrder($tran_id, $requestData);
 
-                    if ($status) {
+                    if ($order_id) {
                         $paymentData['payment_session'] = $this->json_encode($requestData, true);
                         $sslCommerzOrderSessions = $this->SslCommerzOrderSessions->patchEntity($sslCommerzOrderSessions, $paymentData);
                         if ($this->SslCommerzOrderSessions->save($sslCommerzOrderSessions)) {

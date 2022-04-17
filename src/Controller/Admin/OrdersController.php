@@ -115,7 +115,7 @@ class OrdersController extends AppController
                 $orders = $this->Orders->save($orders);
                 if ($orders->id) {
                     try {
-                        $this->getComponent('EmailHandler')->cancelOrderEmail($orders);
+                        $this->getComponent('EmailHandler')->completeOrderEmail($orders);
                     } catch (Exception $e) {
                         $this->log($e->getMessage());
                     }
