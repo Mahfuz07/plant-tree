@@ -109,7 +109,7 @@ class EmailHandlerComponent extends BaseComponent
             $mail->addAddress($order['customer_email'], $order['customer_name']);     //Add a recipient
 
             $mail->isHTML(true);                                  //Set email format to HTML
-            $mail->Subject = 'Your Order Has been Cancel';
+            $mail->Subject = 'Your Order Has been Complete';
             $mail->Body    = "Hello " . $order['customer_name'] .", <br>Your Order " .$order['order_id']. " has been Completed!";
             $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
