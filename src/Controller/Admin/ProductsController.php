@@ -6,6 +6,8 @@ use App\Controller\AppController;
 use Cake\Event\EventInterface;
 use Cake\Routing\Router;
 use Cake\Utility\Security;
+use Imagine\Gd\Imagine;
+use Imagine\Image\Box;
 
 
 class ProductsController extends AppController
@@ -43,8 +45,7 @@ class ProductsController extends AppController
 
     }
 
-    public function add ()
-    {
+    public function add () {
 
         $categoryList = $this->Categories->find()->where(['published' => 1])->select(['id', 'title'])->orderDesc('id')->toArray();
 
@@ -66,13 +67,18 @@ class ProductsController extends AppController
 
                             $image_name = $key . '-' .$requestData['slug'] . '-' . strtotime(date('Y-m-d H:i:s'));
                             $targetPath = WWW_ROOT . 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
+                            $thumbTargetPath = WWW_ROOT . 'img' . DS . 'product_images' . DS . 'thumb'. DS . $image_name . '.' . $ext;
 
                             if(in_array(strtolower($ext),$extension)) {
                                 if(!file_exists($targetPath)) {
                                     $tmp_name->moveTo($targetPath);
+
+                                    $image = new Imagine();
+                                    $image->open($targetPath)->thumbnail( new Box(200,200))->save($thumbTargetPath);
+
                                     $productImages = $this->ProductImages->newEmptyEntity();
                                     $productImage['product_id'] = $products->id;
-                                    $productImage['image_path'] = 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
+                                    $productImage['image_path'] = $image_name . '.' . $ext;
                                     $productImages = $this->ProductImages->patchEntity($productImages, $productImage);
                                     $productImages = $this->ProductImages->save($productImages);
                                 } else {
@@ -113,8 +119,6 @@ class ProductsController extends AppController
         if ($this->request->getData()) {
 
             $requestData = $this->request->getData();
-//            $slug = $this->Categories->find()->where(['slug' => $requestData['slug']])->first();
-//            if (empty($slug)) {
                 if (!empty($requestData)) {
                     $products = $this->Products->get($id);
                     $products = $this->Products->patchEntity($products, $requestData);
@@ -160,13 +164,18 @@ class ProductsController extends AppController
 
                         $image_name = $product['slug'] . '-' . strtotime(date('Y-m-d H:i:s'));
                         $targetPath = WWW_ROOT . 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
+                        $thumbTargetPath = WWW_ROOT . 'img' . DS . 'product_images' . DS . 'thumb'. DS . $image_name . '.' . $ext;
 
                         if (in_array(strtolower($ext), $extension)) {
                             if (!file_exists($targetPath)) {
                                 $upload_image->moveTo($targetPath);
+
+                                $image = new Imagine();
+                                $image->open($targetPath)->thumbnail( new Box(200,200))->save($thumbTargetPath);
+
                                 $productImages = $this->ProductImages->newEmptyEntity();
                                 $productImage['product_id'] = $id;
-                                $productImage['image_path'] = 'img' . DS . 'product_images' . DS . $image_name . '.' . $ext;
+                                $productImage['image_path'] = $image_name . '.' . $ext;
                                 $productImages = $this->ProductImages->patchEntity($productImages, $productImage);
                                 $productImages = $this->ProductImages->save($productImages);
                             }
@@ -206,8 +215,8 @@ class ProductsController extends AppController
             $getProductImage = $this->ProductImages->find()->where(['id' => $id])->first();
 
             if (!empty($getProductImage)) {
-                if (is_file(WWW_ROOT . $getProductImage['image_path'])) {
-                    unlink(WWW_ROOT . $getProductImage['image_path']);
+                if (is_file(WWW_ROOT . 'img' . DS . 'product_images' . DS . $getProductImage['image_path'])) {
+                    unlink(WWW_ROOT . 'img' . DS . 'product_images' . DS . $getProductImage['image_path']);
                 }
                 if ($this->ProductImages->delete($getProductImage)) {
                     $this->Flash->success('Product Image has been deleted!', ['key'=>'success']);
@@ -215,6 +224,37 @@ class ProductsController extends AppController
                 } else {
                     $this->Flash->error('Oops Product Image not has been deleted!', ['key'=>'error']);
                     $this->redirect('/admin/products/upload-image/' . $getProductImage['product_id']);
+                }
+            }
+        }
+    }
+
+    public function delete($id) {
+
+        if (!empty($id)) {
+
+            $product = $this->Products->find()->where(['id' => $id])->first();
+
+            if (!empty($product)) {
+
+                if ($this->Products->delete($product)) {
+                    $getProductImage = $this->ProductImages->find()->where(['product_id' => $id])->toArray();
+
+                    if (!empty($getProductImage)) {
+                        foreach ($getProductImage as $image) {
+                            if (is_file(WWW_ROOT . 'img' . DS . 'product_images' . DS . $image['image_path'])) {
+                                unlink(WWW_ROOT . 'img' . DS . 'product_images' . DS . $image['image_path']);
+                            }
+                        }
+
+                        if ($this->ProductImages->deleteAll(['product_id' => $id])) {
+                            $this->Flash->success('Product Image has been deleted!', ['key' => 'success']);
+                            $this->redirect('/admin/products');
+                        } else {
+                            $this->Flash->error('Oops Product Image not has been deleted!', ['key' => 'error']);
+                            $this->redirect('/admin/products');
+                        }
+                    }
                 }
             }
         }

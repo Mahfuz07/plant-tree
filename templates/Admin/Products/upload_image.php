@@ -99,7 +99,7 @@ use Cake\Routing\Router;
                                                 <tr>
                                                     <td><?= $image['id'] ?></td>
                                                     <td >
-                                                        <img src="<?= Router::fullBaseUrl() . '/' . $image['image_path'] ;?>" alt="Product Image" width="60" height="60"/><br>
+                                                        <img src="<?= Router::fullBaseUrl() . '/' . 'img' . DS . 'product_images' . DS .  $image['image_path'] ;?>" alt="Product Image" width="60" height="60"/><br>
                                                     </td>
 
                                                     <td>

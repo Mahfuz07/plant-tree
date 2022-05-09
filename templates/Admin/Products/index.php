@@ -82,7 +82,7 @@ use Cake\Routing\Router;
                                             <td><?= $product['title'] ?></td>
                                             <td><?= $product['display_name'] ?></td>
                                             <td>
-                                                <img src="<?= Router::fullBaseUrl() . '/' . $product['image'] ;?>" alt="Product Image" width="90" height="60"/><br><br>
+                                                <img src="<?= Router::fullBaseUrl() . '/' . 'img' . DS . 'product_images' . DS .  $product['image'] ;?>" alt="Product Image" width="90" height="60"/><br><br>
                                                 <?= $this->Html->link('Upload Image',['controller' => 'Products' , 'action' => 'uploadImage', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?>
                                             </td>
                                             <td><?= $product['description'] ?></td>
@@ -90,7 +90,7 @@ use Cake\Routing\Router;
                                             <td><?= $product['published'] ?></td>
                                             <td><?= $this->Html->link('Edit',['controller' => 'Products' , 'action' => 'edit', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?>
                                                 &nbsp;&nbsp;&nbsp;
-                                                <?= $this->Html->link('Delete',['controller' => 'Products' , 'action' => 'edit', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?></td>
+                                                <?= $this->Html->link('Delete',['controller' => 'Products' , 'action' => 'delete', $product['id']], ['style' => 'transition: all 0.4s ease-in-out; color: #7571f9;']) ?></td>
                                         </tr>
                                     <?php } ?>
                                     </tbody>

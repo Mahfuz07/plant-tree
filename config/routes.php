@@ -93,6 +93,8 @@ return static function (RouteBuilder $routes) {
 
         $routes->connect('/products/edit/*', ['controller' => 'Products',  'action' => 'edit']);
 
+        $routes->connect('/products/delete/*', ['controller' => 'Products',  'action' => 'delete']);
+
         $routes->connect('/products', ['controller' => 'Products',  'action' => 'index']);
 
         $routes->connect('/products/upload-image/*', ['controller' => 'Products',  'action' => 'uploadImage']);
