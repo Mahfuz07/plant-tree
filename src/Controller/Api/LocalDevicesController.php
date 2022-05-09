@@ -588,7 +588,7 @@ class LocalDevicesController extends AppController
                         if (!empty($images)) {
                             $imageArray = [];
                             foreach ($images as $image) {
-                                $imageArray[] = $fullUrl . '/' . $image['image_path'];
+                                $imageArray[] = $fullUrl . '/' . 'img' . DS . 'product_images' . DS . $image['image_path'];
                             }
                             $product['image'] = $imageArray;
                         }

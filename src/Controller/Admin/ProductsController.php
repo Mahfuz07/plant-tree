@@ -254,6 +254,9 @@ class ProductsController extends AppController
                             $this->Flash->error('Oops Product Image not has been deleted!', ['key' => 'error']);
                             $this->redirect('/admin/products');
                         }
+                    } else {
+                        $this->Flash->success('Product Image has been deleted!', ['key' => 'success']);
+                        $this->redirect('/admin/products');
                     }
                 }
             }
